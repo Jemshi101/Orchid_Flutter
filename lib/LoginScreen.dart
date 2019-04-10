@@ -3,39 +3,18 @@ import 'dart:developer';
 import 'package:Orchid/SearchScreen.dart';
 import 'package:Orchid/constants/SharedPrefKeys.dart';
 import 'package:Orchid/utils/ColorUtil.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'styles.dart';
 
-void main() => runApp(MyApp());
 
-class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Orchid',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
-        primarySwatch: Colors.brown,
-      ),
-      home: MyHomePage(title: 'Orchid'),
-    );
-  }
-}
 
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
+class LoginScreen extends StatefulWidget {
+  LoginScreen({Key key, this.title}) : super(key: key);
 
   // This widget is the home page of your application. It is stateful, meaning
   // that it has a State object (defined below) that contains fields that affect
@@ -49,40 +28,36 @@ class MyHomePage extends StatefulWidget {
   final String title;
 
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  _LoginScreenState createState() => _LoginScreenState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  final _usernameController = TextEditingController();
+class _LoginScreenState extends State<LoginScreen> {
+  final _scaffoldKey = new GlobalKey<ScaffoldState>();
+
+  final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+
+  final firebaseAuth = FirebaseAuth.instance;
 
   int _counter = 0;
 
-  bool isInit = true;
   bool isLoggedIn = false;
-  bool isLogInVisible = false;
 
   @override
   void dispose() {
-    _usernameController.dispose();
+    _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
 
   void _setLoggedInStatus(bool isLoggedIn) {
     setState(() {
-      isLogInVisible = !isLoggedIn;
       this.isLoggedIn = isLoggedIn;
-      isInit = false;
     });
   }
 
-  void initState() {
-    super.initState();
-    if (SchedulerBinding.instance.schedulerPhase == SchedulerPhase.idle) {
-      SchedulerBinding.instance
-          .addPostFrameCallback((_) => _checkForLogIn(context));
-    }
+  Future<FirebaseUser> getUser() async {
+    return await firebaseAuth.currentUser();
   }
 
   void _incrementCounter() {
@@ -93,11 +68,9 @@ class _MyHomePageState extends State<MyHomePage> {
       // _counter without calling setState(), then the build method would not be
       // called again, and so nothing would appear to happen.
       _counter++;
-      isInit = !isInit;
 
       if (_counter == 5) {
         isLoggedIn = true;
-        isInit = false;
       }
     });
   }
@@ -105,8 +78,9 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       /*appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
+        // Here we take the value from the LoginScreen object that was created by
         // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
       ),*/
@@ -126,11 +100,9 @@ class _MyHomePageState extends State<MyHomePage> {
                 child: Image.asset('assets/images/logo.png',
                     alignment: AlignmentDirectional.topCenter),
               ),
-              isInit
-                  ? _getLoadingLayout(context)
-                  : !isLoggedIn
-                      ? _getLoginLayout(context)
-                      : _navigateToSearchPage(),
+                   !isLoggedIn
+                  ? _getLoginLayout(context)
+                  : _navigateToSearchPage(),
             ],
           )
         ]),
@@ -143,27 +115,6 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Flex _getLoadingLayout(BuildContext context) {
-    return Flex(
-      direction: Axis.vertical,
-      children: [
-        CircularProgressIndicator(
-          backgroundColor: ColorUtil.getColorFromHex('#ff000000'),
-          valueColor: new AlwaysStoppedAnimation(ColorUtil('#ffffffff')),
-        ),
-        Padding(
-          padding: EdgeInsets.all(50),
-          child: Text(
-            'Please Wait...',
-            style:
-                Styles.getWhiteTextTheme(Theme.of(context).textTheme.display1),
-            textAlign: TextAlign.center,
-          ),
-        ),
-      ],
-    );
-  }
-
   Flex _getLoginLayout(BuildContext context) {
     return Flex(
       direction: Axis.vertical,
@@ -173,14 +124,18 @@ class _MyHomePageState extends State<MyHomePage> {
           child: Theme(
             data: Styles.getInputBoxTheme(),
             child: TextField(
-              controller: _usernameController,
+              textInputAction: TextInputAction.next,
+              maxLines: 1,
+              keyboardType: TextInputType.emailAddress,
+              autofocus: false,
+              controller: _emailController,
               style:
-                  Styles.getWhiteTextTheme(Theme.of(context).textTheme.title),
+              Styles.getWhiteTextTheme(Theme.of(context).textTheme.title),
               decoration: InputDecoration(
                   labelStyle:
-                      TextStyle(color: ColorUtil.getColorFromHex("#ffffffff")),
+                  TextStyle(color: ColorUtil.getColorFromHex("#ffffffff")),
                   filled: true,
-                  labelText: 'Username',
+                  labelText: 'Email Address',
                   border: OutlineInputBorder(
                       borderRadius: BorderRadius.all(Radius.circular(5)))),
             ),
@@ -191,12 +146,15 @@ class _MyHomePageState extends State<MyHomePage> {
           child: Theme(
             data: Styles.getInputBoxTheme(),
             child: TextField(
+              textInputAction: TextInputAction.done,
+              maxLines: 1,
+              autofocus: false,
               controller: _passwordController,
               style:
-                  Styles.getWhiteTextTheme(Theme.of(context).textTheme.title),
+              Styles.getWhiteTextTheme(Theme.of(context).textTheme.title),
               decoration: InputDecoration(
                   labelStyle:
-                      TextStyle(color: ColorUtil.getColorFromHex("#ffffffff")),
+                  TextStyle(color: ColorUtil.getColorFromHex("#ffffffff")),
                   filled: true,
                   labelText: 'Password',
                   border: OutlineInputBorder(
@@ -217,15 +175,15 @@ class _MyHomePageState extends State<MyHomePage> {
                 highlightColor: Colors.amberAccent,
                 splashColor: Colors.amber,
                 enableFeedback: true,
-                onTap: (){
+                onTap: () {
                   _onLoginPressed();
                 },
                 child: Container(
-                  padding: EdgeInsets.fromLTRB(25, 5, 25, 5),
+                  padding: EdgeInsets.fromLTRB(35, 10, 35, 10),
                   child: Text(
                     "Login",
                     style: Styles.getWhiteTextTheme(
-                        Theme.of(context).textTheme.display1),
+                        Theme.of(context).textTheme.title),
                   ),
                 )),
           ),
@@ -241,44 +199,90 @@ class _MyHomePageState extends State<MyHomePage> {
 
   _navigateToSearchPage() {
     Route route = MaterialPageRoute(builder: (context) => SearchScreen());
-    Navigator.push(context, route);
-  }
-
-  _checkForLogIn(BuildContext context) async {
-    log("In Check For Login");
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    if (prefs.getKeys().contains(SharedPrefKeys.IS_LOGGED_IN)) {
-      _setLoggedInStatus(prefs.getBool(SharedPrefKeys.IS_LOGGED_IN));
-    } else {
-      _setLoggedInStatus(false);
-    }
-    /*int counter = (prefs.getInt('counter') ?? 0) + 1;
-    print('Pressed $counter times.');
-    await prefs.setInt('counter', counter);*/
+    Navigator.pushReplacement(context, route);
   }
 
   _onLoginPressed() {
-    String username = _usernameController.text;
+    String email = _emailController.text;
     String password = _passwordController.text;
 
-    if (validate(username, password)) {
-      performLogin(username, password);
+    if (validate(email, password)) {
+      _performLogin(email, password);
     }
   }
 
-  bool validate(String username, String password) {
-    if (username.isEmpty) {
+  bool validate(String email, String password) {
+    if (email.isEmpty) {
+      _showSnackBar(
+          "Please Enter the Email Address", Duration(seconds: 5), null);
       return false;
     }
     if (password.isEmpty || password.length < 8) {
+      _showSnackBar("Please Enter the Password", Duration(seconds: 5), null);
       return false;
     }
     return true;
   }
 
-  void performLogin(String username, String password) {
-    //todo Login then navigate to Search Page
+  _performLogin(String email, String password) async {
+    await firebaseAuth
+        .signInWithEmailAndPassword(email: email, password: password)
+        .then((user) {
+      if (user != null) {
+        _saveUser(user);
+        _navigateToSearchPage();
+      }
+    }).catchError((e) {
+      print(e);
+      if (e.code == "ERROR_USER_NOT_FOUND") {
+        _performSignUp(email, password);
+      } else {
+        _showSnackBar(e.details, Duration(seconds: 10), null);
+      }
+    });
+  }
 
-    _navigateToSearchPage();
+  void _saveUser(FirebaseUser user) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString(SharedPrefKeys.USER_ID, user.uid);
+    await prefs.setBool(SharedPrefKeys.IS_LOGGED_IN, true);
+  }
+
+  _performSignUp(String email, String password) async {
+    await firebaseAuth
+        .createUserWithEmailAndPassword(
+      email: email,
+      password: password,
+    )
+        .then((user) {
+      if (user != null) {
+        _saveUser(user);
+        _navigateToSearchPage();
+      } else {
+        _showSnackBar("User registration failed. Please try again later!!!!",
+            Duration(seconds: 5), null);
+      }
+    }).catchError((e) {
+      _showSnackBar(e.details, Duration(seconds: 10), null);
+    });
+  }
+
+  _showSnackBar(String message, Duration time, SnackBarAction action) {
+    var snackBar;
+    if (action == null) {
+      snackBar = SnackBar(
+        content: Text(message),
+        duration: time,
+      );
+    } else {
+      snackBar = SnackBar(
+        content: Text(message),
+        action: action,
+        duration: time,
+      );
+    }
+
+    // Find the Scaffold in the Widget tree and use it to show a SnackBar!
+    _scaffoldKey.currentState.showSnackBar(snackBar);
   }
 }

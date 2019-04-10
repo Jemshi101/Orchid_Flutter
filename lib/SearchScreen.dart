@@ -17,16 +17,9 @@ class SearchScreen extends StatefulWidget {
 class _SearchScreenState extends State<SearchScreen> {
   int _counter = 0;
 
-  bool isInit = true;
-  bool isLoggedIn = false;
-  bool isLogInVisible = false;
+  bool isLoading = true;
 
-  void _setLoggedInStatus(bool isLoggedIn) {
-    setState(() {
-      isLogInVisible = !isLoggedIn;
-      this.isLoggedIn = isLoggedIn;
-    });
-  }
+  final _searchController = TextEditingController();
 
   void _incrementCounter() {
     setState(() {
@@ -36,7 +29,7 @@ class _SearchScreenState extends State<SearchScreen> {
       // _counter without calling setState(), then the build method would not be
       // called again, and so nothing would appear to happen.
       _counter++;
-      isInit = !isInit;
+      isLoading = !isLoading;
     });
   }
 
@@ -49,11 +42,11 @@ class _SearchScreenState extends State<SearchScreen> {
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
     return Scaffold(
-      /*appBar: AppBar(
+      appBar: AppBar(
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
-      ),*/
+      ),
 
       body: Container(
         constraints: BoxConstraints.expand(),
@@ -63,14 +56,29 @@ class _SearchScreenState extends State<SearchScreen> {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              Container(
-                width: 200,
-                height: 200,
-                margin: EdgeInsets.all(100),
-                child: Image.asset('assets/images/logo.png',
-                    alignment: AlignmentDirectional.topCenter),
+              Padding(
+                padding: EdgeInsets.fromLTRB(20, 5, 20, 5),
+                child: Theme(
+                  data: Styles.getInputBoxTheme(),
+                  child: TextField(
+                    textInputAction: TextInputAction.go,
+                    maxLines: 1,
+                    keyboardType: TextInputType.text,
+                    autofocus: false,
+                    controller: _searchController,
+                    style:
+                    Styles.getWhiteTextTheme(Theme.of(context).textTheme.title),
+                    decoration: InputDecoration(
+                        labelStyle:
+                        TextStyle(color: ColorUtil.getColorFromHex("#ffffffff")),
+                        filled: true,
+                        labelText: 'Email Address',
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(5)))),
+                  ),
+                ),
               ),
-              isInit
+              isLoading
                   ? Column(
                 children: [
                   CircularProgressIndicator(
@@ -90,15 +98,14 @@ class _SearchScreenState extends State<SearchScreen> {
                   ),
                 ],
               )
-                  : !isLoggedIn?  Column(
+                  : Column(
                 children: <Widget>[
                   Text(
                     '$_counter',
                     style: Theme.of(context).textTheme.display3,
                   ),
                 ],
-              )
-                  : _navigateToMovieDetailPage() ,
+              ) ,
             ],
           ),
         ),

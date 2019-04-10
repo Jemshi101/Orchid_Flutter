@@ -15,8 +15,8 @@ class Styles {
 
   static getInputBoxTheme() {
     return new ThemeData(
-        primaryColor: Colors.green,
-        primaryColorDark: Colors.green,
-        hintColor: Colors.brown);
+        primaryColor: Colors.purple,
+        primaryColorDark: Colors.deepPurple,
+        hintColor: Colors.deepPurpleAccent);
   }
 }
