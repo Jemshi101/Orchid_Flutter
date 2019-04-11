@@ -10,23 +10,26 @@ import 'package:flutter/scheduler.dart';
 import 'styles.dart';
 
 bool isLoggedIn = false;
+bool isInit = true;
 
-void main() async {
-  isLoggedIn = await _checkForLogIn();
+void main() {
+//  isLoggedIn = await _checkForLogIn();
+//  _checkForLogIn();
 
   runApp(MyApp());
 }
 
-_checkForLogIn() async {
+/*_checkForLogIn() async {
   getUser().then((user) {
-    return user != null ? true : false;
+    isLoggedIn = user != null ? true : false;
+    isInit = false;
   });
 }
 
 Future<FirebaseUser> getUser() async {
   final firebaseAuth = FirebaseAuth.instance;
   return await firebaseAuth.currentUser();
-}
+}*/
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
@@ -46,22 +49,7 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.brown,
       ),
-      initialRoute: '/',
-      onGenerateRoute: (RouteSettings settings) {
-        switch (settings.name) {
-          case '/':
-            return MaterialPageRoute(builder: (_) {
-              return isLoggedIn != null && isLoggedIn
-                  ? SearchScreen()
-                  : LoginScreen();
-            });
-          case '/login':
-            return MaterialPageRoute(builder: (_) => LoginScreen());
-          case '/browse':
-            return MaterialPageRoute(builder: (_) => SearchScreen());
-        }
-      },
-//      home: MyHomePage(title: 'Orchid'),
+      home: MyHomePage(title: 'Orchid'),
     );
   }
 }
@@ -95,10 +83,14 @@ class _MyHomePageState extends State<MyHomePage> {
   bool isLoggedIn = false;
 
   void _setLoggedInStatus(bool isLoggedIn) {
-    setState(() {
-      this.isLoggedIn = isLoggedIn;
-      isInit = false;
-    });
+    SchedulerBinding.instance.addPostFrameCallback((_) => setState(() {
+          this.isLoggedIn = isLoggedIn;
+          isInit = false;
+
+          Future.delayed(const Duration(seconds: 2), () {
+            _processLogIn();
+          });
+        }));
   }
 
   void initState() {
@@ -110,15 +102,15 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   _checkForLogIn(BuildContext context) async {
-    Future.delayed(const Duration(seconds: 5), () {
-      getUser().then((user) {
-        if (user != null) {
-          _setLoggedInStatus(true);
-        } else {
-          _setLoggedInStatus(false);
-        }
-      });
+//    Future.delayed(const Duration(seconds: 5), () {
+    getUser().then((user) {
+      if (user != null) {
+        _setLoggedInStatus(true);
+      } else {
+        _setLoggedInStatus(false);
+      }
     });
+//    });
 
     log("In Check For Login");
     /*SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -163,6 +155,22 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title),
       ),*/
 
+      /* initialRoute: '/',
+      onGenerateRoute: (RouteSettings settings) {
+        switch (settings.name) {
+          case '/':
+            return MaterialPageRoute(builder: (_) {
+              return !isInit && isLoggedIn != null && isLoggedIn
+                  ? SearchScreen("Olakka")
+                  : LoginScreen();
+            });
+          case '/login':
+            return MaterialPageRoute(builder: (_) => LoginScreen());
+          case '/browse':
+            return MaterialPageRoute(builder: (_) => SearchScreen("olakka2"));
+        }
+      },
+*/
       body: Container(
         alignment: AlignmentDirectional.topCenter,
         constraints: BoxConstraints.expand(),
@@ -212,8 +220,20 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  _navigateToSearchPage() {
-    Route route = MaterialPageRoute(builder: (context) => SearchScreen());
+  _navigateToSearchPage(BuildContext context) {
+    Route route =
+        MaterialPageRoute(builder: (context) => SearchScreen("Orchid"));
     Navigator.pushReplacement(context, route);
+  }
+
+  _navigateToLoginPage(BuildContext context) {
+    Route route = MaterialPageRoute(builder: (context) => LoginScreen());
+    Navigator.pushReplacement(context, route);
+  }
+
+  void _processLogIn() {
+    !isInit && isLoggedIn != null && isLoggedIn
+        ? _navigateToSearchPage(context)
+        : _navigateToLoginPage(context);
   }
 }

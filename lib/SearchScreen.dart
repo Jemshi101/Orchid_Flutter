@@ -4,11 +4,12 @@ import 'package:flutter/material.dart';
 
 import 'styles.dart';
 
+String _title = "";
 
 class SearchScreen extends StatefulWidget {
-  SearchScreen({Key key, this.title}) : super(key: key);
-
-  final String title;
+  SearchScreen(String title, {Key key}) : super(key: key) {
+    _title = title;
+  }
 
   @override
   _SearchScreenState createState() => _SearchScreenState();
@@ -17,7 +18,7 @@ class SearchScreen extends StatefulWidget {
 class _SearchScreenState extends State<SearchScreen> {
   int _counter = 0;
 
-  bool isLoading = true;
+  bool isLoading = false;
 
   final _searchController = TextEditingController();
 
@@ -33,6 +34,40 @@ class _SearchScreenState extends State<SearchScreen> {
     });
   }
 
+  List<Card> _buildGridCards(int count) {
+    List<Card> cards = List.generate(
+      count,
+          (int index) => Card(
+        clipBehavior: Clip.antiAlias,
+        elevation: 5,
+        color: Colors.white,
+        margin: 2,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            AspectRatio(
+              aspectRatio: 18.0 / 11.0,
+              child: Image.asset('assets/images/Robot.png'),
+            ),
+            Padding(
+              padding: EdgeInsets.fromLTRB(16.0, 12.0, 16.0, 8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  Text('Title'),
+                  SizedBox(height: 8.0),
+                  Text('Secondary Text'),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    return cards;
+  }
+
   @override
   Widget build(BuildContext context) {
     // This method is rerun every time setState is called, for instance as done
@@ -45,7 +80,7 @@ class _SearchScreenState extends State<SearchScreen> {
       appBar: AppBar(
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
+        title: Text(_title),
       ),
 
       body: Container(
@@ -57,7 +92,7 @@ class _SearchScreenState extends State<SearchScreen> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
               Padding(
-                padding: EdgeInsets.fromLTRB(20, 5, 20, 5),
+                padding: EdgeInsets.fromLTRB(20, 50, 20, 5),
                 child: Theme(
                   data: Styles.getInputBoxTheme(),
                   child: TextField(
@@ -66,60 +101,74 @@ class _SearchScreenState extends State<SearchScreen> {
                     keyboardType: TextInputType.text,
                     autofocus: false,
                     controller: _searchController,
-                    style:
-                    Styles.getWhiteTextTheme(Theme.of(context).textTheme.title),
+                    style: Styles.getWhiteTextTheme(
+                        Theme.of(context).textTheme.title),
                     decoration: InputDecoration(
-                        labelStyle:
-                        TextStyle(color: ColorUtil.getColorFromHex("#ffffffff")),
+                        labelStyle: TextStyle(
+                            color: ColorUtil.getColorFromHex("#ffffffff")),
                         filled: true,
-                        labelText: 'Email Address',
+                        labelText: 'Search',
                         border: OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(5)))),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(5)))),
+                    onChanged: (text) {
+                      _onSearchParamChanged(text);
+                    },
                   ),
                 ),
               ),
               isLoading
                   ? Column(
-                children: [
-                  CircularProgressIndicator(
-                    backgroundColor:
-                    ColorUtil.getColorFromHex('#ff000000'),
-                    valueColor: new AlwaysStoppedAnimation(
-                        ColorUtil('#ffffffff')),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.all(50),
-                    child: Text(
-                      'Please Wait...',
-                      style: Styles.getWhiteTextTheme(
-                          Theme.of(context).textTheme.display1),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                ],
-              )
-                  : Column(
-                children: <Widget>[
-                  Text(
-                    '$_counter',
-                    style: Theme.of(context).textTheme.display3,
-                  ),
-                ],
-              ) ,
+                      children: [
+                        CircularProgressIndicator(
+                          backgroundColor:
+                              ColorUtil.getColorFromHex('#ff000000'),
+                          valueColor: new AlwaysStoppedAnimation(
+                              ColorUtil('#ffffffff')),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.all(50),
+                          child: Text(
+                            'Please Wait...',
+                            style: Styles.getWhiteTextTheme(
+                                Theme.of(context).textTheme.display1),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ],
+                    )
+                  : _getMovieGridLayout(context),
             ],
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
+      /*floatingActionButton: FloatingActionButton(
         onPressed: _incrementCounter,
         tooltip: 'Increment',
         child: Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      ),*/ // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
+
+  GridView _getMovieGridLayout(BuildContext context) {
+    return GridView.count(
+      crossAxisCount: 2,
+      padding: EdgeInsets.all(16.0),
+      childAspectRatio: 8.0 / 9.0,
+      // TODO: Build a grid of cards (102)
+      children: _buildGridCards(20),
+    );
+  }
+
 
   _navigateToMovieDetailPage() {
     Route route = MaterialPageRoute(builder: (context) => MovieDetailScreen());
     Navigator.push(context, route);
+  }
+
+  void _onSearchParamChanged(String text) {
+    setState(() {
+      isLoading = true;
+    });
   }
 }

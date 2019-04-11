@@ -198,7 +198,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   _navigateToSearchPage() {
-    Route route = MaterialPageRoute(builder: (context) => SearchScreen());
+    Route route = MaterialPageRoute(builder: (context) => SearchScreen("Orchid"));
     Navigator.pushReplacement(context, route);
   }
 
