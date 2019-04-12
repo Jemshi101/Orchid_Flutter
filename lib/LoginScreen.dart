@@ -1,17 +1,12 @@
-import 'dart:developer';
-
 import 'package:Orchid/SearchScreen.dart';
 import 'package:Orchid/constants/SharedPrefKeys.dart';
 import 'package:Orchid/utils/ColorUtil.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'styles.dart';
-
-
 
 class LoginScreen extends StatefulWidget {
   LoginScreen({Key key, this.title}) : super(key: key);
@@ -100,9 +95,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Image.asset('assets/images/logo.png',
                     alignment: AlignmentDirectional.topCenter),
               ),
-                   !isLoggedIn
-                  ? _getLoginLayout(context)
-                  : _navigateToSearchPage(),
+              !isLoggedIn ? _getLoginLayout(context) : _navigateToSearchPage(),
             ],
           )
         ]),
@@ -130,10 +123,10 @@ class _LoginScreenState extends State<LoginScreen> {
               autofocus: false,
               controller: _emailController,
               style:
-              Styles.getWhiteTextTheme(Theme.of(context).textTheme.title),
+                  Styles.getWhiteTextTheme(Theme.of(context).textTheme.title),
               decoration: InputDecoration(
                   labelStyle:
-                  TextStyle(color: ColorUtil.getColorFromHex("#ffffffff")),
+                      TextStyle(color: ColorUtil.getColorFromHex("#ffffffff")),
                   filled: true,
                   labelText: 'Email Address',
                   border: OutlineInputBorder(
@@ -151,10 +144,10 @@ class _LoginScreenState extends State<LoginScreen> {
               autofocus: false,
               controller: _passwordController,
               style:
-              Styles.getWhiteTextTheme(Theme.of(context).textTheme.title),
+                  Styles.getWhiteTextTheme(Theme.of(context).textTheme.title),
               decoration: InputDecoration(
                   labelStyle:
-                  TextStyle(color: ColorUtil.getColorFromHex("#ffffffff")),
+                      TextStyle(color: ColorUtil.getColorFromHex("#ffffffff")),
                   filled: true,
                   labelText: 'Password',
                   border: OutlineInputBorder(
@@ -166,6 +159,8 @@ class _LoginScreenState extends State<LoginScreen> {
         Padding(
           padding: EdgeInsets.fromLTRB(20, 20, 20, 50),
           child: Material(
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(30))),
             color: Colors.purpleAccent,
             elevation: 5,
             borderRadius: BorderRadius.horizontal(
@@ -198,7 +193,8 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   _navigateToSearchPage() {
-    Route route = MaterialPageRoute(builder: (context) => SearchScreen("Orchid"));
+    Route route =
+        MaterialPageRoute(builder: (context) => SearchScreen("Orchid"));
     Navigator.pushReplacement(context, route);
   }
 

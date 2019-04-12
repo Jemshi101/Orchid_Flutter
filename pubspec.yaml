@@ -25,8 +25,11 @@ dependencies:
   cupertino_icons: ^0.1.2
   shared_preferences: ^0.5.1+2
   firebase_auth: ^0.8.4+2
+  chopper: ^2.0.0
 
 dev_dependencies:
+  build_runner: ^1.0.0
+  chopper_generator: ^2.0.0
   flutter_test:
     sdk: flutter
 
