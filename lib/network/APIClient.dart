@@ -1,6 +1,7 @@
 
 
 import 'package:Orchid/network/API.dart';
+import 'package:Orchid/network/APIUrl.dart';
 import 'package:chopper/chopper.dart';
 
 class APIClient {
@@ -9,7 +10,7 @@ class APIClient {
   static ChopperClient getInstance(){
     if(instance == null){
       instance = ChopperClient(
-        baseUrl: "http://localhost:8000",
+        baseUrl: APIUrl.BASE_URL,
         services: [
           // the generated service
           API.create()

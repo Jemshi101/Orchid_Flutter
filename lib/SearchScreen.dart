@@ -1,6 +1,6 @@
 import 'package:Orchid/MovieDetailScreen.dart';
-import 'package:Orchid/models/Category.dart';
-import 'package:Orchid/repository/ProductsRepository.dart';
+import 'package:Orchid/network/DataManager.dart';
+import 'package:Orchid/network/models/SearchResponse.dart';
 import 'package:Orchid/utils/ColorUtil.dart';
 import 'package:flutter/material.dart';
 
@@ -20,9 +20,24 @@ class SearchScreen extends StatefulWidget {
 class _SearchScreenState extends State<SearchScreen> {
   int _counter = 0;
 
+  String _lastSearchedQuery = "";
+
   bool isLoading = false;
 
+  bool isEmptyList = false;
+
   final _searchController = TextEditingController();
+
+  int _currentPage = 1;
+
+  SearchResponse _currentSearchResponse;
+
+  @override
+  void dispose() {
+    // Clean up the controller when the Widget is disposed
+    _searchController.dispose();
+    super.dispose();
+  }
 
   void _incrementCounter() {
     setState(() {
@@ -52,42 +67,17 @@ class _SearchScreenState extends State<SearchScreen> {
       ),
 
       body: Container(
+        alignment: AlignmentDirectional.topCenter,
         constraints: BoxConstraints.tightForFinite(),
         color: ColorUtil.getColorFromHex('#ff2a2a2a'),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            Padding(
-              padding: EdgeInsets.fromLTRB(20, 50, 20, 5),
-              child: Theme(
-                data: Styles.getInputBoxTheme(),
-                child: TextField(
-                  textInputAction: TextInputAction.go,
-                  maxLines: 1,
-                  keyboardType: TextInputType.text,
-                  autofocus: false,
-                  controller: _searchController,
-                  style: Styles.getWhiteTextTheme(
-                      Theme.of(context).textTheme.title),
-                  decoration: InputDecoration(
-                      labelStyle: TextStyle(
-                          color: ColorUtil.getColorFromHex("#ffffffff")),
-                      filled: true,
-                      labelText: 'Search',
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(5)))),
-                  onChanged: (text) {
-                    _onSearchParamChanged(text);
-                  },
-                ),
-              ),
-            ),
-            isLoading
-                ? _getLoadingLayout(context)
-                : Flexible(child: _getMovieGridLayout(context)),
-          ],
-        ),
+        child: Column(children: [
+          _getSearchBoxLayout(context),
+          isLoading
+              ? _getLoadingLayout(context)
+              : isEmptyList
+                  ? _getNoResultLayout(context)
+                  : Flexible(child: _getMovieGridLayout(context)),
+        ]),
       ),
       /*floatingActionButton: FloatingActionButton(
         onPressed: _incrementCounter,
@@ -97,23 +87,74 @@ class _SearchScreenState extends State<SearchScreen> {
     );
   }
 
-  Column _getLoadingLayout(BuildContext context) {
-    return Column(
-      children: [
-        CircularProgressIndicator(
-          backgroundColor: ColorUtil.getColorFromHex('#ff000000'),
-          valueColor: new AlwaysStoppedAnimation(ColorUtil('#ffffffff')),
-        ),
-        Padding(
-          padding: EdgeInsets.all(50),
-          child: Text(
-            'Please Wait...',
-            style:
-                Styles.getWhiteTextTheme(Theme.of(context).textTheme.display1),
-            textAlign: TextAlign.center,
+  Widget _getSearchBoxLayout(BuildContext context) {
+    return Flex(direction: Axis.vertical, children: [
+      Padding(
+        padding: EdgeInsets.fromLTRB(20, 50, 20, 5),
+        child: Theme(
+          data: Styles.getInputBoxTheme(),
+          child: TextField(
+            textInputAction: TextInputAction.go,
+            maxLines: 1,
+            keyboardType: TextInputType.text,
+            autofocus: false,
+            controller: _searchController,
+            style: Styles.getWhiteTextTheme(Theme.of(context).textTheme.title),
+            decoration: InputDecoration(
+                labelStyle:
+                    TextStyle(color: ColorUtil.getColorFromHex("#ffffffff")),
+                filled: true,
+                labelText: 'Search',
+                border: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(5)))),
+            onChanged: (text) {
+              _onSearchParamChanged(text);
+            },
           ),
         ),
-      ],
+      )
+    ]);
+  }
+
+  Widget _getLoadingLayout(BuildContext context) {
+    return Flex(direction: Axis.vertical, children: [
+      CircularProgressIndicator(
+        backgroundColor: ColorUtil.getColorFromHex('#ff000000'),
+        valueColor: new AlwaysStoppedAnimation(ColorUtil('#ffffffff')),
+      ),
+      Padding(
+        padding: EdgeInsets.all(50),
+        child: Text(
+          'Please Wait...',
+          style: Styles.getWhiteTextTheme(Theme.of(context).textTheme.display1),
+          textAlign: TextAlign.center,
+        ),
+      ),
+    ]);
+  }
+
+  Widget _getNoResultLayout(BuildContext context) {
+    return Flexible(
+      child: Column(
+        children: [
+          Padding(
+            padding: EdgeInsets.fromLTRB(50, 50, 50, 10),
+            child: Image.asset(
+              "assets/images/sloth.jpg",
+              fit: BoxFit.scaleDown,
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.fromLTRB(50, 10, 50, 10),
+            child: Text(
+              'No Movies Found!!!',
+              style: Styles.getWhiteTextTheme(
+                  Theme.of(context).textTheme.display1),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -129,9 +170,8 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   List<Card> _buildGridCards(BuildContext context) {
-    List<Product> products = ProductsRepository.loadProducts(Category.all);
-
-    if (products == null || products.isEmpty) {
+    if (_currentSearchResponse == null ||
+        _currentSearchResponse.movieList.isEmpty) {
       return const <Card>[];
     }
 
@@ -139,7 +179,7 @@ class _SearchScreenState extends State<SearchScreen> {
     /*final NumberFormat formatter = NumberFormat.simpleCurrency(
         locale: Localizations.localeOf(context).toString());*/
 
-    return products.map((product) {
+    return _currentSearchResponse.movieList.map((movieBean) {
       return Card(
         clipBehavior: Clip.antiAlias,
         // TODO: Adjust card heights (103)
@@ -150,10 +190,10 @@ class _SearchScreenState extends State<SearchScreen> {
             AspectRatio(
               aspectRatio: 18 / 11,
               child: Image.asset(
-                "assets/images/Robot.png"
+                "assets/images/Robot.png",
 //                product.assetName,
 //                package: product.assetPackage,
-                // TODO: Adjust the box size (102)
+                fit: BoxFit.cover,
               ),
             ),
             Expanded(
@@ -166,13 +206,13 @@ class _SearchScreenState extends State<SearchScreen> {
                   children: <Widget>[
                     // TODO: Handle overflowing labels (103)
                     Text(
-                      product.name,
+                      movieBean.title,
                       style: theme.textTheme.title,
                       maxLines: 1,
                     ),
                     SizedBox(height: 8.0),
                     Text(
-                      "${product.price}",
+                      "${movieBean.year}",
 //                      formatter.format(product.price),
                       style: theme.textTheme.body2,
                     ),
@@ -191,9 +231,40 @@ class _SearchScreenState extends State<SearchScreen> {
     Navigator.push(context, route);
   }
 
-  void _onSearchParamChanged(String text) {
+  void _onSearchParamChanged(String query) {
     setState(() {
       isLoading = true;
+
+      if (_lastSearchedQuery.toLowerCase() == query.toLowerCase()) {
+        _currentPage += 1;
+      } else {
+        _currentPage = 1;
+      }
+
+      DataManager.searchMovies(query.toLowerCase(), _currentPage).then((value) {
+        if (_currentSearchResponse == null) {
+          _currentSearchResponse = value.responseBody;
+        } else {
+          _currentSearchResponse.movieList
+              .addAll((value.responseBody as SearchResponse).movieList);
+        }
+
+        if (_currentSearchResponse == null ||
+            _currentSearchResponse.movieList.isEmpty) {
+          isEmptyList = true;
+        } else {
+          isEmptyList = false;
+        }
+        isLoading = false;
+      }).catchError((error) {
+        if (_currentSearchResponse == null ||
+            _currentSearchResponse.movieList.isEmpty) {
+          isEmptyList = true;
+        } else {
+          isEmptyList = false;
+        }
+        isLoading = false;
+      });
     });
   }
 }

@@ -7,7 +7,7 @@ import 'package:chopper/chopper.dart';
 
 part "API.chopper.dart";
 
-@ChopperApi(baseUrl: "/")
+@ChopperApi(baseUrl: "")
 abstract class API extends ChopperService {
   static API create([ChopperClient client]) => _$API(client);
 
@@ -17,14 +17,14 @@ abstract class API extends ChopperService {
 // MOVIE DETAILS
 // http://www.omdbapi.com/?i=tt0038399&plot=full&apiKey=75a9f74
 
-  @Get(url: APIUrl.SEARCH_MOVIES)
+  @Get(path: APIUrl.SEARCH_MOVIES)
   Future<Response<SearchResponse>> searchMovies(
     @Query("s") String query,
     @Query("page") int page,
     @Query("apiKey") String apiKey,
   );
 
-  @Get(url: APIUrl.MOVIE_DETAILS)
+  @Get(path: APIUrl.MOVIE_DETAILS)
   Future<Response<MovieDetailResponse>> getMovieDetails(
     @Query("i") String imdbID,
     @Query("plot") String page,
