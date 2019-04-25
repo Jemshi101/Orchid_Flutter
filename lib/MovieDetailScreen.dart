@@ -1,12 +1,16 @@
+import 'package:Orchid/models/MovieBean.dart';
+import 'package:Orchid/network/models/MovieDetailResponse.dart';
 import 'package:Orchid/utils/ColorUtil.dart';
 import 'package:flutter/material.dart';
 
 import 'styles.dart';
 
 class MovieDetailScreen extends StatefulWidget {
-  MovieDetailScreen({Key key, this.title}) : super(key: key);
+  MovieDetailScreen(this.movieBean, {Key key, this.title}) : super(key: key);
 
   final String title;
+  final MovieBean movieBean;
+  MovieDetailResponse movieDetailResponse;
 
   @override
   _MovieDetailScreenState createState() => _MovieDetailScreenState();
@@ -14,6 +18,8 @@ class MovieDetailScreen extends StatefulWidget {
 
 class _MovieDetailScreenState extends State<MovieDetailScreen> {
   int _counter = 0;
+
+  bool isLoading = false;
 
   void _incrementCounter() {
     setState(() {
@@ -43,33 +49,22 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
       body: Container(
         constraints: BoxConstraints.expand(),
         color: ColorUtil.getColorFromHex('#ff2a2a2a'),
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
-              Container(
-                width: 200,
-                height: 200,
-                margin: EdgeInsets.all(100),
-                child: Image.asset('assets/images/logo.png',
-                    alignment: AlignmentDirectional.topCenter),
-              ),
-              CircularProgressIndicator(
-                backgroundColor: ColorUtil.getColorFromHex('#ff000000'),
-                valueColor: new AlwaysStoppedAnimation(ColorUtil('#ffffffff')),
-              ),
-              Padding(
-                padding: EdgeInsets.all(50),
-                child: Text(
-                  'Please Wait...',
-                  style: Styles.getWhiteTextTheme(
-                      Theme.of(context).textTheme.display1),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-            ],
-          ),
+        padding: const EdgeInsets.all(16.0),
+        child: ListView(
+          scrollDirection: Axis.vertical,
+          children: <Widget>[
+            Image.network(
+                widget.movieDetailResponse != null
+                    ? widget.movieDetailResponse.poster
+                    : widget.movieBean.poster,
+                fit: BoxFit.contain,
+                alignment: AlignmentDirectional.topStart),
+            isLoading
+                ? _getLoadingLayout(context)
+                : widget.movieDetailResponse == null
+                    ? _getErrorLayout(context)
+                    : Flexible(child: _getMovieDetailsLayout(context)),
+          ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
@@ -77,6 +72,76 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
         tooltip: 'Increment',
         child: Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.
+    );
+  }
+
+  Widget _getLoadingLayout(BuildContext context) {
+    return Padding(
+        padding: EdgeInsets.all(20),
+        child: Flex(direction: Axis.vertical, children: [
+          CircularProgressIndicator(
+            backgroundColor: ColorUtil.getColorFromHex('#ff000000'),
+            valueColor: new AlwaysStoppedAnimation(ColorUtil('#ffffffff')),
+          ),
+          Padding(
+            padding: EdgeInsets.all(50),
+            child: Text(
+              'Please Wait...',
+              style: Styles.getWhiteTextTheme(
+                  Theme.of(context).textTheme.display1),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ]));
+  }
+
+  Widget _getErrorLayout(BuildContext context) {
+    return Flexible(
+      child: Column(
+        children: [
+          Padding(
+            padding: EdgeInsets.fromLTRB(50, 50, 50, 10),
+            child: Image.asset(
+              "assets/images/sloth.jpg",
+              fit: BoxFit.scaleDown,
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.fromLTRB(50, 10, 50, 10),
+            child: Text(
+              'Movie Detail Not Found!!!',
+              style: Styles.getWhiteTextTheme(
+                  Theme.of(context).textTheme.display1),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _getMovieDetailsLayout(BuildContext context) {
+    return Flexible(
+      child: Column(
+        children: [
+          Padding(
+            padding: EdgeInsets.fromLTRB(50, 50, 50, 10),
+            child: Image.asset(
+              "assets/images/sloth.jpg",
+              fit: BoxFit.scaleDown,
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.fromLTRB(50, 10, 50, 10),
+            child: Text(
+              'Movie Detail Not Found!!!',
+              style: Styles.getWhiteTextTheme(
+                  Theme.of(context).textTheme.display1),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

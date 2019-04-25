@@ -14,21 +14,20 @@ class _$API extends API {
 
   final definitionType = API;
 
-  Future<Response<SearchResponse>> searchMovies(
-      String query, int page, String apiKey) {
-    final $url = '//';
+  Future<Response> searchMovies(String query, int page, String apiKey) {
+    final $url = '/';
     final Map<String, dynamic> $params = {
       's': query,
       'page': page,
       'apiKey': apiKey
     };
     final $request = Request('GET', $url, client.baseUrl, parameters: $params);
-    return client.send<SearchResponse, SearchResponse>($request);
+    return client.send<dynamic, dynamic>($request);
   }
 
   Future<Response<MovieDetailResponse>> getMovieDetails(
       String imdbID, String page, String apiKey) {
-    final $url = '//';
+    final $url = '/';
     final Map<String, dynamic> $params = {
       'i': imdbID,
       'plot': page,

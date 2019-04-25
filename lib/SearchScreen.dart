@@ -1,4 +1,5 @@
 import 'package:Orchid/MovieDetailScreen.dart';
+import 'package:Orchid/models/MovieBean.dart';
 import 'package:Orchid/network/DataManager.dart';
 import 'package:Orchid/network/models/SearchResponse.dart';
 import 'package:Orchid/utils/ColorUtil.dart';
@@ -18,18 +19,17 @@ class SearchScreen extends StatefulWidget {
 }
 
 class _SearchScreenState extends State<SearchScreen> {
+  final _searchController = TextEditingController();
+  ScrollController _scrollController;
+
   int _counter = 0;
 
-  String _lastSearchedQuery = "";
-
   bool isLoading = false;
-
   bool isEmptyList = false;
 
-  final _searchController = TextEditingController();
 
+  String _lastSearchedQuery = "";
   int _currentPage = 1;
-
   SearchResponse _currentSearchResponse;
 
   @override
@@ -37,6 +37,28 @@ class _SearchScreenState extends State<SearchScreen> {
     // Clean up the controller when the Widget is disposed
     _searchController.dispose();
     super.dispose();
+  }
+
+  @override
+  void initState() {
+    _scrollController = ScrollController();
+    _scrollController.addListener(() {
+      if (_scrollController.offset >=
+              _scrollController.position.maxScrollExtent &&
+          !_scrollController.position.outOfRange) {
+        if (_currentSearchResponse != null &&
+            _currentSearchResponse.movieList.length <
+                num.parse(_currentSearchResponse.totalResults)) {}
+        _onSearchParamChanged(_searchController.text, false);
+//          message = "reach the bottom";
+      }
+      if (_scrollController.offset <=
+              _scrollController.position.minScrollExtent &&
+          !_scrollController.position.outOfRange) {
+//          message = "reach the top";
+      }
+    });
+    super.initState();
   }
 
   void _incrementCounter() {
@@ -108,7 +130,7 @@ class _SearchScreenState extends State<SearchScreen> {
                 border: OutlineInputBorder(
                     borderRadius: BorderRadius.all(Radius.circular(5)))),
             onChanged: (text) {
-              _onSearchParamChanged(text);
+              _onSearchParamChanged(text, true);
             },
           ),
         ),
@@ -117,20 +139,23 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   Widget _getLoadingLayout(BuildContext context) {
-    return Flex(direction: Axis.vertical, children: [
-      CircularProgressIndicator(
-        backgroundColor: ColorUtil.getColorFromHex('#ff000000'),
-        valueColor: new AlwaysStoppedAnimation(ColorUtil('#ffffffff')),
-      ),
-      Padding(
-        padding: EdgeInsets.all(50),
-        child: Text(
-          'Please Wait...',
-          style: Styles.getWhiteTextTheme(Theme.of(context).textTheme.display1),
-          textAlign: TextAlign.center,
-        ),
-      ),
-    ]);
+    return Padding(
+        padding: EdgeInsets.all(20),
+        child: Flex(direction: Axis.vertical, children: [
+          CircularProgressIndicator(
+            backgroundColor: ColorUtil.getColorFromHex('#ff000000'),
+            valueColor: new AlwaysStoppedAnimation(ColorUtil('#ffffffff')),
+          ),
+          Padding(
+            padding: EdgeInsets.all(50),
+            child: Text(
+              'Please Wait...',
+              style: Styles.getWhiteTextTheme(
+                  Theme.of(context).textTheme.display1),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ]));
   }
 
   Widget _getNoResultLayout(BuildContext context) {
@@ -165,6 +190,7 @@ class _SearchScreenState extends State<SearchScreen> {
       childAspectRatio: 8.0 / 9.0,
       // TODO: Build a grid of cards (102)
       children: _buildGridCards(context),
+      controller: _scrollController,
 //      children: [],
     );
   }
@@ -183,72 +209,99 @@ class _SearchScreenState extends State<SearchScreen> {
       return Card(
         clipBehavior: Clip.antiAlias,
         // TODO: Adjust card heights (103)
-        child: Column(
-          // TODO: Center items on the card (103)
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            AspectRatio(
-              aspectRatio: 18 / 11,
-              child: Image.asset(
-                "assets/images/Robot.png",
-//                product.assetName,
+        child: Material(
+          child: InkWell(
+            key: Key("movie"),
+            highlightColor: Colors.amberAccent,
+            splashColor: Colors.amber,
+            enableFeedback: true,
+            onTap: () {
+              _navigateToMovieDetailPage(movieBean);
+            },
+            child: Stack(
+                // TODO: Center items on the card (103)
+                alignment: AlignmentDirectional.topCenter,
+                children: <Widget>[
+                  AspectRatio(
+                    aspectRatio: 8 / 9,
+                    child: Image.network(
+//                "assets/images/Robot.png",
+                      movieBean.poster,
 //                package: product.assetPackage,
-                fit: BoxFit.cover,
-              ),
-            ),
-            Expanded(
-              child: Padding(
-                padding: EdgeInsets.fromLTRB(16.0, 12.0, 16.0, 8.0),
-                child: Column(
-                  // TODO: Align labels to the bottom and center (103)
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  // TODO: Change innermost Column (103)
-                  children: <Widget>[
-                    // TODO: Handle overflowing labels (103)
-                    Text(
-                      movieBean.title,
-                      style: theme.textTheme.title,
-                      maxLines: 1,
+                      fit: BoxFit.cover,
                     ),
-                    SizedBox(height: 8.0),
-                    Text(
-                      "${movieBean.year}",
+                  ),
+                  Align(
+                    alignment: Alignment.bottomCenter,
+                    child: Container(
+                      color: ColorUtil.getColorFromHex("#bb101010"),
+                      child: Padding(
+                        padding: EdgeInsets.fromLTRB(16.0, 12.0, 16.0, 8.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          mainAxisSize: MainAxisSize.min,
+                          children: <Widget>[
+                            // TODO: Handle overflowing labels (103)
+                            Text(
+                              movieBean.title,
+                              textAlign: TextAlign.center,
+                              style: Styles.getWhiteTextTheme(
+                                  theme.textTheme.title),
+//                              maxLines: 1,
+                            ),
+                            SizedBox(height: 8.0),
+                            Text(
+                              "${movieBean.year}",
+                              textAlign: TextAlign.center,
 //                      formatter.format(product.price),
-                      style: theme.textTheme.body2,
+                              style: Styles.getWhiteTextTheme(
+                                  theme.textTheme.body2),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
-                  ],
-                ),
-              ),
-            ),
-          ],
+                  )
+                ]),
+          ),
         ),
       );
     }).toList();
   }
 
-  _navigateToMovieDetailPage() {
-    Route route = MaterialPageRoute(builder: (context) => MovieDetailScreen());
+  _navigateToMovieDetailPage(MovieBean movieBean) {
+    Route route = MaterialPageRoute(
+        builder: (context) => MovieDetailScreen(
+              movieBean,
+              title: movieBean.title,
+            ));
     Navigator.push(context, route);
   }
 
-  void _onSearchParamChanged(String query) {
-    setState(() {
-      isLoading = true;
+  void _onSearchParamChanged(String query, bool isLoadingRequired) {
+    if (isLoadingRequired) {
+      setState(() {
+        isLoading = isLoadingRequired;
+      });
+    }
 
-      if (_lastSearchedQuery.toLowerCase() == query.toLowerCase()) {
-        _currentPage += 1;
+    if (_lastSearchedQuery.toLowerCase() == query.toLowerCase()) {
+      _currentPage += 1;
+    } else {
+      _currentPage = 1;
+      _currentSearchResponse = null;
+      _lastSearchedQuery = query;
+    }
+
+    DataManager.searchMovies(query.toLowerCase(), _currentPage).then((value) {
+      if (_currentSearchResponse == null) {
+        _currentSearchResponse = value.responseBody;
       } else {
-        _currentPage = 1;
+        _currentSearchResponse.movieList
+            .addAll((value.responseBody as SearchResponse).movieList);
       }
 
-      DataManager.searchMovies(query.toLowerCase(), _currentPage).then((value) {
-        if (_currentSearchResponse == null) {
-          _currentSearchResponse = value.responseBody;
-        } else {
-          _currentSearchResponse.movieList
-              .addAll((value.responseBody as SearchResponse).movieList);
-        }
-
+      setState(() {
         if (_currentSearchResponse == null ||
             _currentSearchResponse.movieList.isEmpty) {
           isEmptyList = true;
@@ -256,7 +309,9 @@ class _SearchScreenState extends State<SearchScreen> {
           isEmptyList = false;
         }
         isLoading = false;
-      }).catchError((error) {
+      });
+    }).catchError((error) {
+      setState(() {
         if (_currentSearchResponse == null ||
             _currentSearchResponse.movieList.isEmpty) {
           isEmptyList = true;

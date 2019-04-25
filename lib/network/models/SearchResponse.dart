@@ -1,7 +1,8 @@
 import 'package:Orchid/network/models/BaseResponse.dart';
 import 'package:Orchid/models/MovieBean.dart';
 
-class SearchResponse extends BaseResponse {
+class SearchResponse with BaseResponse {
+
 
   List<MovieBean> movieList = new List();
   String totalResults = "0";

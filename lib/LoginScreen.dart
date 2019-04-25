@@ -32,6 +32,9 @@ class _LoginScreenState extends State<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
+  final FocusNode _emailFocus = FocusNode();
+  final FocusNode _passwordFocus = FocusNode();
+
   final firebaseAuth = FirebaseAuth.instance;
 
   int _counter = 0;
@@ -121,7 +124,11 @@ class _LoginScreenState extends State<LoginScreen> {
               maxLines: 1,
               keyboardType: TextInputType.emailAddress,
               autofocus: false,
+              focusNode: _emailFocus,
               controller: _emailController,
+              onSubmitted: (text) {
+                _fieldFocusChange(context, _emailFocus, _passwordFocus);
+              },
               style:
                   Styles.getWhiteTextTheme(Theme.of(context).textTheme.title),
               decoration: InputDecoration(
@@ -142,7 +149,11 @@ class _LoginScreenState extends State<LoginScreen> {
               textInputAction: TextInputAction.done,
               maxLines: 1,
               autofocus: false,
+              focusNode: _passwordFocus,
               controller: _passwordController,
+              onSubmitted: (text) {
+                _passwordFocus.unfocus();
+              },
               style:
                   Styles.getWhiteTextTheme(Theme.of(context).textTheme.title),
               decoration: InputDecoration(
@@ -159,14 +170,18 @@ class _LoginScreenState extends State<LoginScreen> {
         Padding(
           padding: EdgeInsets.fromLTRB(20, 20, 20, 50),
           child: Material(
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(30))),
+//            shape: RoundedRectangleBorder(
+//                borderRadius: BorderRadius.horizontal(
+//                    left: Radius.circular(30), right: Radius.circular(30))),
             color: Colors.purpleAccent,
             elevation: 5,
             borderRadius: BorderRadius.horizontal(
                 left: Radius.circular(30), right: Radius.circular(30)),
             child: InkWell(
+                radius: 30,
                 key: Key("login"),
+                borderRadius: BorderRadius.horizontal(
+                    left: Radius.circular(30), right: Radius.circular(30)),
                 highlightColor: Colors.amberAccent,
                 splashColor: Colors.amber,
                 enableFeedback: true,
@@ -261,6 +276,12 @@ class _LoginScreenState extends State<LoginScreen> {
     }).catchError((e) {
       _showSnackBar(e.details, Duration(seconds: 10), null);
     });
+  }
+
+  _fieldFocusChange(
+      BuildContext context, FocusNode currentFocus, FocusNode nextFocus) {
+    currentFocus.unfocus();
+    FocusScope.of(context).requestFocus(nextFocus);
   }
 
   _showSnackBar(String message, Duration time, SnackBarAction action) {

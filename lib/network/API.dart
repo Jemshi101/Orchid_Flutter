@@ -18,16 +18,16 @@ abstract class API extends ChopperService {
 // http://www.omdbapi.com/?i=tt0038399&plot=full&apiKey=75a9f74
 
   @Get(path: APIUrl.SEARCH_MOVIES)
-  Future<Response<SearchResponse>> searchMovies(
+  Future<Response> searchMovies(
     @Query("s") String query,
     @Query("page") int page,
     @Query("apiKey") String apiKey,
   );
 
   @Get(path: APIUrl.MOVIE_DETAILS)
-  Future<Response<MovieDetailResponse>> getMovieDetails(
+  Future<Response> getMovieDetails(
     @Query("i") String imdbID,
-    @Query("plot") String page,
+    @Query("plot") String plot,
     @Query("apiKey") String apiKey,
   );
 
