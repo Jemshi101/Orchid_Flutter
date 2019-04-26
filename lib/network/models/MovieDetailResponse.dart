@@ -1,33 +1,31 @@
-
-
 import 'package:Orchid/models/Ratings.dart';
 
 class MovieDetailResponse {
-  String title = "";
-  String year = "";
-  String rated = "";
-  String released = "";
-  String runtime = "";
-  String genre = "";
-  String director = "";
-  String writer = "";
-  String actors = "";
-  String plot = "";
-  String language = "";
-  String country = "";
-  String awards = "";
-  String poster = "";
   List<Ratings> ratings = List();
-  String metaScore = "";
+  String actors = "";
+  String awards = "";
+  String boxOffice = "";
+  String country = "";
+  String director = "";
+  String DVD = "";
+  String genre = "";
+  String imdbID = "";
   String imdbRating = "";
   String imdbVotes = "";
-  String imdbID = "";
-  String type = "";
-  String DVD = "";
-  String boxOffice = "";
+  String language = "";
+  String metaScore = "";
+  String plot = "";
+  String poster = "";
   String production = "";
-  String website = "";
+  String rated = "";
+  String released = "";
   String response = "";
+  String runtime = "";
+  String title = "";
+  String type = "";
+  String website = "";
+  String writer = "";
+  String year = "";
 
   MovieDetailResponse.fromJsonMap(Map<String, dynamic> map)
       : title = map["Title"],
@@ -87,6 +85,16 @@ class MovieDetailResponse {
     data['Response'] = response;
     return data;
   }
+
+  double getAverageRating() {
+    if (ratings == null || ratings.isEmpty) {
+      return 0;
+    } else {
+      double total = 0;
+      ratings.forEach((rating) {
+        total += num.parse(rating.value);
+      });
+      return total / ratings.length;
+    }
+  }
 }
-
-

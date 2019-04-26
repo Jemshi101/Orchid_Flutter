@@ -25,15 +25,14 @@ class _$API extends API {
     return client.send<dynamic, dynamic>($request);
   }
 
-  Future<Response<MovieDetailResponse>> getMovieDetails(
-      String imdbID, String page, String apiKey) {
+  Future<Response> getMovieDetails(String imdbID, String plot, String apiKey) {
     final $url = '/';
     final Map<String, dynamic> $params = {
       'i': imdbID,
-      'plot': page,
+      'plot': plot,
       'apiKey': apiKey
     };
     final $request = Request('GET', $url, client.baseUrl, parameters: $params);
-    return client.send<MovieDetailResponse, MovieDetailResponse>($request);
+    return client.send<dynamic, dynamic>($request);
   }
 }

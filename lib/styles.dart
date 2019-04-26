@@ -6,6 +6,11 @@ class Styles {
       color: Colors.white,
     );
   }
+  static getColoredTextTheme(TextStyle textStyle, Color color) {
+    return textStyle.apply(
+      color: color,
+    );
+  }
 
   static getTextTheme() {
     return new TextStyle(
