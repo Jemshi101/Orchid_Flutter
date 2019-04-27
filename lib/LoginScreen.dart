@@ -1,4 +1,5 @@
 import 'package:Orchid/SearchScreen.dart';
+import 'package:Orchid/constants/Colors.dart';
 import 'package:Orchid/constants/SharedPrefKeys.dart';
 import 'package:Orchid/utils/ColorUtil.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -86,7 +87,7 @@ class _LoginScreenState extends State<LoginScreen> {
       body: Container(
         alignment: AlignmentDirectional.topCenter,
         constraints: BoxConstraints.expand(),
-        color: ColorUtil.getColorFromHex('#ff2a2a2a'),
+        color: ColorConstant.CARBON,
         child: ListView(children: [
           Flex(
             direction: Axis.vertical,

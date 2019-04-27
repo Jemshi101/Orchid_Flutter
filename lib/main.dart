@@ -2,7 +2,7 @@ import 'dart:developer';
 
 import 'package:Orchid/LoginScreen.dart';
 import 'package:Orchid/SearchScreen.dart';
-import 'package:Orchid/utils/ColorUtil.dart';
+import 'package:Orchid/constants/Colors.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -47,7 +47,7 @@ class MyApp extends StatelessWidget {
         // or simply save your changes to "hot reload" in a Flutter IDE).
         // Notice that the counter didn't reset back to zero; the application
         // is not restarted.
-        primarySwatch: Colors.brown,
+        primarySwatch: Colors.purple,
       ),
       home: MyHomePage(title: 'Orchid'),
     );
@@ -174,7 +174,7 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Container(
         alignment: AlignmentDirectional.topCenter,
         constraints: BoxConstraints.expand(),
-        color: ColorUtil.getColorFromHex('#ff2a2a2a'),
+        color: ColorConstant.CARBON,
         child: ListView(children: [
           Flex(
             direction: Axis.vertical,
@@ -204,8 +204,8 @@ class _MyHomePageState extends State<MyHomePage> {
       direction: Axis.vertical,
       children: [
         CircularProgressIndicator(
-          backgroundColor: ColorUtil.getColorFromHex('#ff000000'),
-          valueColor: new AlwaysStoppedAnimation(ColorUtil('#ffffffff')),
+          backgroundColor: ColorConstant.BLACK,
+          valueColor: new AlwaysStoppedAnimation(ColorConstant.OLAKKA),
         ),
         Padding(
           padding: EdgeInsets.all(50),

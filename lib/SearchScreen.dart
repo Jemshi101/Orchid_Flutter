@@ -1,4 +1,5 @@
 import 'package:Orchid/MovieDetailScreen.dart';
+import 'package:Orchid/constants/Colors.dart';
 import 'package:Orchid/models/MovieBean.dart';
 import 'package:Orchid/network/DataManager.dart';
 import 'package:Orchid/network/models/SearchResponse.dart';
@@ -91,7 +92,7 @@ class _SearchScreenState extends State<SearchScreen> {
       body: Container(
         alignment: AlignmentDirectional.topCenter,
         constraints: BoxConstraints.tightForFinite(),
-        color: ColorUtil.getColorFromHex('#ff2a2a2a'),
+        color: ColorConstant.CARBON,
         child: Column(children: [
           _getSearchBoxLayout(context),
           isLoading
@@ -143,7 +144,7 @@ class _SearchScreenState extends State<SearchScreen> {
         padding: EdgeInsets.all(20),
         child: Flex(direction: Axis.vertical, children: [
           CircularProgressIndicator(
-            backgroundColor: ColorUtil.getColorFromHex('#ff000000'),
+            backgroundColor: ColorConstant.BLACK,
             valueColor: new AlwaysStoppedAnimation(ColorUtil('#ffffffff')),
           ),
           Padding(

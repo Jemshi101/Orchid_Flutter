@@ -1,4 +1,5 @@
 import 'package:Orchid/constants/AppConstants.dart';
+import 'package:Orchid/constants/Colors.dart';
 import 'package:Orchid/models/MovieBean.dart';
 import 'package:Orchid/network/DataManager.dart';
 import 'package:Orchid/network/models/MovieDetailResponse.dart';
@@ -49,11 +50,11 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
 
       body: Container(
         constraints: BoxConstraints.expand(),
-        color: ColorUtil.getColorFromHex('#ff2a2a2a'),
-        padding: const EdgeInsets.all(16.0),
+        color: ColorConstant.CARBON,
         child: isLoading
             ? _getLoadingLayout(context)
             : ListView(
+                padding: const EdgeInsets.all(16.0),
                 scrollDirection: Axis.vertical,
                 children: <Widget>[
                   _getHeaderLayout(),
@@ -71,21 +72,175 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
     );
   }
 
-  Padding _getHeaderLayout() {
+  Widget _getHeaderLayout() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(0, 0, 0, 20),
-      child: FractionallySizedBox(
-        alignment: Alignment.topLeft,
-        widthFactor: .5,
-        child: AspectRatio(
-          aspectRatio: 1 / 1,
-          child: Image.network(
-              movieDetailResponse != null
-                  ? movieDetailResponse.poster
-                  : widget.movieBean.poster,
-              fit: BoxFit.contain,
-              alignment: AlignmentDirectional.topStart),
+      child: movieDetailResponse == null
+          ? _getErrorHeaderLayout(context)
+          : _getHeaderDetailLayout(),
+    );
+  }
+
+  Widget _getErrorHeaderLayout(BuildContext context) {
+    return AspectRatio(
+      aspectRatio: 1 / 1,
+      child: Image.network(widget.movieBean.poster,
+          fit: BoxFit.contain, alignment: AlignmentDirectional.topStart),
+    );
+  }
+
+  Widget _getHeaderDetailLayout() {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        Flexible(
+          flex: 1,
+          fit: FlexFit.loose,
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(0, 0, 16, 0),
+            child: Image.network(
+                movieDetailResponse != null
+                    ? movieDetailResponse.poster
+                    : widget.movieBean.poster,
+                fit: BoxFit.contain,
+                alignment: AlignmentDirectional.topStart),
+          ),
         ),
+        Flexible(
+          flex: 1,
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                _getYearLayout(),
+                _getGenreLayout(),
+                _getLanguageLayout(),
+                _getIMDBRatingLayout(),
+                _getIMDBVotesLayout(),
+              ],
+            ),
+          ),
+        )
+      ],
+    );
+  }
+
+  Widget _getYearLayout() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Text(
+          'Year : ',
+          style: Styles.getColoredTextTheme(
+              Theme.of(context).textTheme.subtitle, ColorConstant.OLAKKA),
+          textAlign: TextAlign.start,
+        ),
+        Text(
+          '${movieDetailResponse != null ? movieDetailResponse.year : widget.movieBean.year}',
+          style: Styles.getWhiteTextTheme(Theme.of(context).textTheme.title),
+          textAlign: TextAlign.start,
+          textScaleFactor: .8,
+        ),
+      ],
+    );
+  }
+
+  Widget _getGenreLayout() {
+    return Container(
+      margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text(
+            'Genre : ',
+            style: Styles.getColoredTextTheme(
+                Theme.of(context).textTheme.subtitle, ColorConstant.OLAKKA),
+            textAlign: TextAlign.start,
+          ),
+          Text(
+            '${movieDetailResponse.genre}',
+            style: Styles.getWhiteTextTheme(Theme.of(context).textTheme.title),
+            textAlign: TextAlign.start,
+            textScaleFactor: .8,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _getLanguageLayout() {
+    return Container(
+      margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text(
+            'Language : ',
+            style: Styles.getColoredTextTheme(
+                Theme.of(context).textTheme.subtitle, ColorConstant.OLAKKA),
+            textAlign: TextAlign.start,
+          ),
+          Text(
+            '${movieDetailResponse.language}',
+            style: Styles.getWhiteTextTheme(Theme.of(context).textTheme.title),
+            textAlign: TextAlign.start,
+            textScaleFactor: .8,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _getIMDBRatingLayout() {
+    return Container(
+      margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text(
+            'Rating : ',
+            style: Styles.getColoredTextTheme(
+                Theme.of(context).textTheme.subtitle, ColorConstant.OLAKKA),
+            textAlign: TextAlign.start,
+          ),
+          Text(
+            '${movieDetailResponse.imdbRating}',
+            style: Styles.getWhiteTextTheme(Theme.of(context).textTheme.title),
+            textAlign: TextAlign.start,
+            textScaleFactor: .8,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _getIMDBVotesLayout() {
+    return Container(
+      margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text(
+            'Votes : ',
+            style: Styles.getColoredTextTheme(
+                Theme.of(context).textTheme.subtitle, ColorConstant.OLAKKA),
+            textAlign: TextAlign.start,
+          ),
+          Text(
+            '${movieDetailResponse.imdbVotes}',
+            style: Styles.getWhiteTextTheme(Theme.of(context).textTheme.title),
+            textAlign: TextAlign.start,
+            textScaleFactor: .8,
+          ),
+        ],
       ),
     );
   }
@@ -94,7 +249,313 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
     return Column(
       children: [
         _getTitleLayout(context),
+        _getPlotSummaryLayout(context),
+        _getDirectorLayout(context),
+        _getCastLayout(context),
+        _getWriterLayout(context),
+        _getRuntimeLayout(context),
+        _getWebsiteLayout(context),
+        _getAwardsLayout(context),
+        _getReleasedLayout(context),
+        _getBoxOfficeLayout(context),
+        _getRatedLayout(context),
+        _getCountryLayout(context),
       ],
+    );
+  }
+
+  Widget _getTitleLayout(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        Text(
+          'Title : ',
+          style: Styles.getColoredTextTheme(
+              Theme.of(context).textTheme.subtitle, ColorConstant.OLAKKA),
+          textAlign: TextAlign.start,
+        ),
+        Text(
+          '${movieDetailResponse != null ? movieDetailResponse.title : widget.movieBean.title}',
+          style: Styles.getWhiteTextTheme(Theme.of(context).textTheme.title),
+          textAlign: TextAlign.start,
+        ),
+      ],
+    );
+  }
+
+  Widget _getPlotSummaryLayout(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          Text(
+            'Plot Summary : ',
+            style: Styles.getColoredTextTheme(
+                Theme.of(context).textTheme.subtitle, ColorConstant.OLAKKA),
+            textAlign: TextAlign.start,
+          ),
+          Text(
+            '${movieDetailResponse.plot}',
+            style: Styles.getWhiteTextTheme(Theme.of(context).textTheme.title),
+            textAlign: TextAlign.start,
+            textScaleFactor: .8,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _getDirectorLayout(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          Text(
+            'Director : ',
+            style: Styles.getColoredTextTheme(
+                Theme.of(context).textTheme.subtitle, ColorConstant.OLAKKA),
+            textAlign: TextAlign.start,
+          ),
+          Text(
+            '${movieDetailResponse.director}',
+            style: Styles.getWhiteTextTheme(Theme.of(context).textTheme.title),
+            textAlign: TextAlign.start,
+            textScaleFactor: .8,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _getCastLayout(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          Text(
+            'Cast : ',
+            style: Styles.getColoredTextTheme(
+                Theme.of(context).textTheme.subtitle, ColorConstant.OLAKKA),
+            textAlign: TextAlign.start,
+          ),
+          Text(
+            '${movieDetailResponse.actors}',
+            style: Styles.getWhiteTextTheme(Theme.of(context).textTheme.title),
+            textAlign: TextAlign.start,
+            textScaleFactor: .8,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _getWriterLayout(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          Text(
+            'Writer : ',
+            style: Styles.getColoredTextTheme(
+                Theme.of(context).textTheme.subtitle, ColorConstant.OLAKKA),
+            textAlign: TextAlign.start,
+          ),
+          Text(
+            '${movieDetailResponse.writer}',
+            style: Styles.getWhiteTextTheme(Theme.of(context).textTheme.title),
+            textAlign: TextAlign.start,
+            textScaleFactor: .8,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _getWebsiteLayout(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          Text(
+            'Website : ',
+            style: Styles.getColoredTextTheme(
+                Theme.of(context).textTheme.subtitle, ColorConstant.OLAKKA),
+            textAlign: TextAlign.start,
+          ),
+          Text(
+            '${movieDetailResponse.website}',
+            style: Styles.getWhiteTextTheme(Theme.of(context).textTheme.title),
+            textAlign: TextAlign.start,
+            textScaleFactor: .8,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _getAwardsLayout(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          Text(
+            'Awards : ',
+            style: Styles.getColoredTextTheme(
+                Theme.of(context).textTheme.subtitle, ColorConstant.OLAKKA),
+            textAlign: TextAlign.start,
+          ),
+          Text(
+            '${movieDetailResponse.awards}',
+            style: Styles.getWhiteTextTheme(Theme.of(context).textTheme.title),
+            textAlign: TextAlign.start,
+            textScaleFactor: .8,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _getRuntimeLayout(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          Text(
+            'Runtime : ',
+            style: Styles.getColoredTextTheme(
+                Theme.of(context).textTheme.subtitle, ColorConstant.OLAKKA),
+            textAlign: TextAlign.start,
+          ),
+          Text(
+            '${movieDetailResponse.runtime}',
+            style: Styles.getWhiteTextTheme(Theme.of(context).textTheme.title),
+            textAlign: TextAlign.start,
+            textScaleFactor: .8,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _getReleasedLayout(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          Text(
+            'Released : ',
+            style: Styles.getColoredTextTheme(
+                Theme.of(context).textTheme.subtitle, ColorConstant.OLAKKA),
+            textAlign: TextAlign.start,
+          ),
+          Text(
+            '${movieDetailResponse.released}',
+            style: Styles.getWhiteTextTheme(Theme.of(context).textTheme.title),
+            textAlign: TextAlign.start,
+            textScaleFactor: .8,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _getBoxOfficeLayout(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          Text(
+            'Box Office : ',
+            style: Styles.getColoredTextTheme(
+                Theme.of(context).textTheme.subtitle, ColorConstant.OLAKKA),
+            textAlign: TextAlign.start,
+          ),
+          Text(
+            '${movieDetailResponse.boxOffice}',
+            style: Styles.getWhiteTextTheme(Theme.of(context).textTheme.title),
+            textAlign: TextAlign.start,
+            textScaleFactor: .8,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _getProductionLayout(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          Text(
+            'Production : ',
+            style: Styles.getColoredTextTheme(
+                Theme.of(context).textTheme.subtitle, ColorConstant.OLAKKA),
+            textAlign: TextAlign.start,
+          ),
+          Text(
+            '${movieDetailResponse.production}',
+            style: Styles.getWhiteTextTheme(Theme.of(context).textTheme.title),
+            textAlign: TextAlign.start,
+            textScaleFactor: .8,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _getRatedLayout(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          Text(
+            'Rated : ',
+            style: Styles.getColoredTextTheme(
+                Theme.of(context).textTheme.subtitle, ColorConstant.OLAKKA),
+            textAlign: TextAlign.start,
+          ),
+          Text(
+            '${movieDetailResponse.rated}',
+            style: Styles.getWhiteTextTheme(Theme.of(context).textTheme.title),
+            textAlign: TextAlign.start,
+            textScaleFactor: .8,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _getCountryLayout(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          Text(
+            'Country : ',
+            style: Styles.getColoredTextTheme(
+                Theme.of(context).textTheme.subtitle, ColorConstant.OLAKKA),
+            textAlign: TextAlign.start,
+          ),
+          Text(
+            '${movieDetailResponse.country}',
+            style: Styles.getWhiteTextTheme(Theme.of(context).textTheme.title),
+            textAlign: TextAlign.start,
+            textScaleFactor: .8,
+          ),
+        ],
+      ),
     );
   }
 
@@ -106,7 +567,7 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               CircularProgressIndicator(
-                backgroundColor: ColorUtil.getColorFromHex('#ff000000'),
+                backgroundColor: ColorConstant.BLACK,
                 valueColor: new AlwaysStoppedAnimation(ColorUtil('#ffffffff')),
               ),
               Padding(
@@ -143,24 +604,6 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
           ),
         ],
       ),
-    );
-  }
-
-  Widget _getTitleLayout(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: <Widget>[
-        Text(
-          'Title : ',
-          style: Styles.getWhiteTextTheme(Theme.of(context).textTheme.subtitle),
-          textAlign: TextAlign.start,
-        ),
-        Text(
-          '${movieDetailResponse != null ? movieDetailResponse.title : widget.movieBean.title}',
-          style: Styles.getWhiteTextTheme(Theme.of(context).textTheme.title),
-          textAlign: TextAlign.start,
-        ),
-      ],
     );
   }
 
