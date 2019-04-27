@@ -588,9 +588,12 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
         children: [
           Padding(
             padding: EdgeInsets.fromLTRB(50, 50, 50, 10),
-            child: Image.asset(
-              "assets/images/sloth.jpg",
-              fit: BoxFit.scaleDown,
+            child: AspectRatio(
+              aspectRatio: 1 / 1,
+              child: Image.asset(
+                "assets/images/sloth.jpg",
+                fit: BoxFit.scaleDown,
+              ),
             ),
           ),
           Padding(

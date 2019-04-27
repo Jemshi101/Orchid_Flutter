@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'styles.dart';
 
 String _title = "";
+double currentScrollOffset = -1;
 
 class SearchScreen extends StatefulWidget {
   SearchScreen(String title, {Key key}) : super(key: key) {
@@ -28,7 +29,6 @@ class _SearchScreenState extends State<SearchScreen> {
   bool isLoading = false;
   bool isEmptyList = false;
 
-
   String _lastSearchedQuery = "";
   int _currentPage = 1;
   SearchResponse _currentSearchResponse;
@@ -36,6 +36,7 @@ class _SearchScreenState extends State<SearchScreen> {
   @override
   void dispose() {
     // Clean up the controller when the Widget is disposed
+    _searchController.removeListener(_scrollListener);
     _searchController.dispose();
     super.dispose();
   }
@@ -43,23 +44,28 @@ class _SearchScreenState extends State<SearchScreen> {
   @override
   void initState() {
     _scrollController = ScrollController();
-    _scrollController.addListener(() {
-      if (_scrollController.offset >=
-              _scrollController.position.maxScrollExtent &&
-          !_scrollController.position.outOfRange) {
-        if (_currentSearchResponse != null &&
-            _currentSearchResponse.movieList.length <
-                num.parse(_currentSearchResponse.totalResults)) {}
-        _onSearchParamChanged(_searchController.text, false);
-//          message = "reach the bottom";
-      }
-      if (_scrollController.offset <=
-              _scrollController.position.minScrollExtent &&
-          !_scrollController.position.outOfRange) {
-//          message = "reach the top";
-      }
-    });
+//    if (currentScrollOffset > 0) _scrollController.jumpTo(currentScrollOffset);
+    _scrollController.addListener(_scrollListener);
     super.initState();
+  }
+
+  void _scrollListener() {
+    currentScrollOffset = _scrollController.offset;
+
+    if (_scrollController.offset >=
+            _scrollController.position.maxScrollExtent &&
+        !_scrollController.position.outOfRange) {
+      if (_currentSearchResponse != null &&
+          _currentSearchResponse.movieList.length <
+              num.parse(_currentSearchResponse.totalResults)) {}
+      _onSearchParamChanged(_searchController.text, false);
+      //          message = "reach the bottom";
+    }
+    if (_scrollController.offset <=
+            _scrollController.position.minScrollExtent &&
+        !_scrollController.position.outOfRange) {
+      //          message = "reach the top";
+    }
   }
 
   void _incrementCounter() {
@@ -89,20 +95,27 @@ class _SearchScreenState extends State<SearchScreen> {
         title: Text(_title),
       ),
 
-      body: Container(
-        alignment: AlignmentDirectional.topCenter,
-        constraints: BoxConstraints.tightForFinite(),
-        color: ColorConstant.CARBON,
-        child: Column(children: [
-          _getSearchBoxLayout(context),
-          isLoading
-              ? _getLoadingLayout(context)
-              : isEmptyList
-                  ? _getNoResultLayout(context)
-                  : Flexible(child: _getMovieGridLayout(context)),
-        ]),
-      ),
-      /*floatingActionButton: FloatingActionButton(
+      body: Stack(
+        children: <Widget>[
+//          _getMovieGridLayout(context),
+          Container(
+            constraints: BoxConstraints.expand(),
+            color: ColorConstant.CARBON,
+          ),
+          Column(
+            children: <Widget>[
+//              if (isLoading) LinearProgressIndicator(),
+              _getSearchBoxLayout(context),
+//              _getMovieGridLayout(context),
+              isLoading
+                  ? _getLoadingLayout(context)
+                  : isEmptyList
+                      ? _getNoResultLayout(context)
+                      : _getMovieGridLayout(context)
+            ],
+          ),
+        ],
+      ), /*floatingActionButton: FloatingActionButton(
         onPressed: _incrementCounter,
         tooltip: 'Increment',
         child: Icon(Icons.add),
@@ -111,88 +124,126 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   Widget _getSearchBoxLayout(BuildContext context) {
-    return Flex(direction: Axis.vertical, children: [
-      Padding(
-        padding: EdgeInsets.fromLTRB(20, 50, 20, 5),
-        child: Theme(
-          data: Styles.getInputBoxTheme(),
-          child: TextField(
-            textInputAction: TextInputAction.go,
-            maxLines: 1,
-            keyboardType: TextInputType.text,
-            autofocus: false,
-            controller: _searchController,
-            style: Styles.getWhiteTextTheme(Theme.of(context).textTheme.title),
-            decoration: InputDecoration(
-                labelStyle:
-                    TextStyle(color: ColorUtil.getColorFromHex("#ffffffff")),
-                filled: true,
-                labelText: 'Search',
-                border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(5)))),
-            onChanged: (text) {
-              _onSearchParamChanged(text, true);
-            },
-          ),
-        ),
-      )
-    ]);
-  }
-
-  Widget _getLoadingLayout(BuildContext context) {
     return Padding(
-        padding: EdgeInsets.all(20),
-        child: Flex(direction: Axis.vertical, children: [
-          CircularProgressIndicator(
-            backgroundColor: ColorConstant.BLACK,
-            valueColor: new AlwaysStoppedAnimation(ColorUtil('#ffffffff')),
-          ),
-          Padding(
-            padding: EdgeInsets.all(50),
-            child: Text(
-              'Please Wait...',
-              style: Styles.getWhiteTextTheme(
-                  Theme.of(context).textTheme.display1),
-              textAlign: TextAlign.center,
-            ),
-          ),
-        ]));
-  }
-
-  Widget _getNoResultLayout(BuildContext context) {
-    return Flexible(
-      child: Column(
-        children: [
-          Padding(
-            padding: EdgeInsets.fromLTRB(50, 50, 50, 10),
-            child: Image.asset(
-              "assets/images/sloth.jpg",
-              fit: BoxFit.scaleDown,
-            ),
-          ),
-          Padding(
-            padding: EdgeInsets.fromLTRB(50, 10, 50, 10),
-            child: Text(
-              'No Movies Found!!!',
-              style: Styles.getWhiteTextTheme(
-                  Theme.of(context).textTheme.display1),
-              textAlign: TextAlign.center,
-            ),
-          ),
+      padding: EdgeInsets.fromLTRB(20, 20, 20, 5),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisSize: MainAxisSize.max,
+        children: <Widget>[
+          Flexible(
+              flex: 1,
+              child: Theme(
+                data: Styles.getInputBoxTheme(),
+                child: TextField(
+                  textInputAction: TextInputAction.go,
+                  maxLines: 1,
+                  keyboardType: TextInputType.text,
+                  autofocus: false,
+                  controller: _searchController,
+                  style: Styles.getWhiteTextTheme(
+                      Theme.of(context).textTheme.title),
+                  decoration: InputDecoration(
+                      labelStyle: TextStyle(
+                          color: ColorUtil.getColorFromHex("#bbffffff")),
+                      filled: true,
+                      labelText: 'Search Movies',
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(5)))),
+                  onChanged: (text) {
+                    _onSearchParamChanged(text, true);
+                  },
+                ),
+              )),
         ],
       ),
     );
   }
 
-  GridView _getMovieGridLayout(BuildContext context) {
-    return GridView.count(
-      crossAxisCount: 2,
-      padding: EdgeInsets.all(16.0),
-      childAspectRatio: 8.0 / 9.0,
-      // TODO: Build a grid of cards (102)
-      children: _buildGridCards(context),
-      controller: _scrollController,
+  Widget _getLoadingLayout(BuildContext context) {
+    return Flexible(
+      flex: 1,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.vertical,
+        child: Padding(
+            padding: EdgeInsets.fromLTRB(0, 80, 0, 0),
+            child: Center(
+              child: Column(
+                  mainAxisSize: MainAxisSize.max,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CircularProgressIndicator(
+                      backgroundColor: ColorConstant.BLACK,
+                      valueColor:
+                          new AlwaysStoppedAnimation(ColorUtil('#ffffffff')),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.all(50),
+                      child: Text(
+                        'Please Wait...',
+                        style: Styles.getWhiteTextTheme(
+                            Theme.of(context).textTheme.display1),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ]),
+            )),
+      ),
+    );
+  }
+
+  Widget _getNoResultLayout(BuildContext context) {
+    return Flexible(
+      flex: 1,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.vertical,
+        child: Column(
+          children: [
+            Padding(
+              padding: EdgeInsets.fromLTRB(60, 0, 60, 0),
+              child: AspectRatio(
+                aspectRatio: 1 / 1,
+                child: Image.asset(
+                  "assets/images/sloth.jpg",
+                  fit: BoxFit.contain,
+                ),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.fromLTRB(50, 0, 50, 50),
+              child: Text(
+                'No Movies Found!!!',
+                style: Styles.getWhiteTextTheme(
+                    Theme.of(context).textTheme.display1),
+                textAlign: TextAlign.center,
+                textScaleFactor: .7,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _getMovieGridLayout(BuildContext context) {
+    /*return SliverPadding(
+      padding: const EdgeInsets.all(16.0),
+      sliver: SliverGrid.count(
+        childAspectRatio: 8.0 / 9.0,
+        crossAxisCount: 2,
+        children: _buildGridCards(context),
+      ),
+    );*/
+
+    return Flexible(
+      flex: 1,
+      child: GridView.count(
+        crossAxisCount: 2,
+        padding: EdgeInsets.all(16.0),
+        childAspectRatio: 8.0 / 9.0,
+        children: _buildGridCards(context),
+        controller: _scrollController,
 //      children: [],
+      ),
     );
   }
 
@@ -280,47 +331,49 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   void _onSearchParamChanged(String query, bool isLoadingRequired) {
-    if (isLoadingRequired) {
-      setState(() {
-        isLoading = isLoadingRequired;
-      });
-    }
-
-    if (_lastSearchedQuery.toLowerCase() == query.toLowerCase()) {
-      _currentPage += 1;
-    } else {
-      _currentPage = 1;
-      _currentSearchResponse = null;
-      _lastSearchedQuery = query;
-    }
-
-    DataManager.searchMovies(query.toLowerCase(), _currentPage).then((value) {
-      if (_currentSearchResponse == null) {
-        _currentSearchResponse = value.responseBody;
-      } else {
-        _currentSearchResponse.movieList
-            .addAll((value.responseBody as SearchResponse).movieList);
+    if (query.length >= 3) {
+      if (isLoadingRequired) {
+        setState(() {
+          isLoading = isLoadingRequired;
+        });
       }
 
-      setState(() {
-        if (_currentSearchResponse == null ||
-            _currentSearchResponse.movieList.isEmpty) {
-          isEmptyList = true;
+      if (_lastSearchedQuery.toLowerCase() == query.toLowerCase()) {
+        _currentPage += 1;
+      } else {
+        _currentPage = 1;
+        _currentSearchResponse = null;
+        _lastSearchedQuery = query;
+      }
+
+      DataManager.searchMovies(query.toLowerCase(), _currentPage).then((value) {
+        if (_currentSearchResponse == null) {
+          _currentSearchResponse = value.responseBody;
         } else {
-          isEmptyList = false;
+          _currentSearchResponse.movieList
+              .addAll((value.responseBody as SearchResponse).movieList);
         }
-        isLoading = false;
+
+        setState(() {
+          if (_currentSearchResponse == null ||
+              _currentSearchResponse.movieList.isEmpty) {
+            isEmptyList = true;
+          } else {
+            isEmptyList = false;
+          }
+          isLoading = false;
+        });
+      }).catchError((error) {
+        setState(() {
+          if (_currentSearchResponse == null ||
+              _currentSearchResponse.movieList.isEmpty) {
+            isEmptyList = true;
+          } else {
+            isEmptyList = false;
+          }
+          isLoading = false;
+        });
       });
-    }).catchError((error) {
-      setState(() {
-        if (_currentSearchResponse == null ||
-            _currentSearchResponse.movieList.isEmpty) {
-          isEmptyList = true;
-        } else {
-          isEmptyList = false;
-        }
-        isLoading = false;
-      });
-    });
+    }
   }
 }
