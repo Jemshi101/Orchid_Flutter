@@ -276,17 +276,23 @@ class _SearchScreenState extends State<SearchScreen> {
                 children: <Widget>[
                   AspectRatio(
                     aspectRatio: 8 / 9,
-                    child: Image.network(
+                    child: FadeInImage.assetNetwork(
+                      placeholder: "assets/images/little-dino.jpg",
+                      image: movieBean.poster,
+                      fit: BoxFit.cover,
+                    ),
+                    /*child: Image.network(
 //                "assets/images/Robot.png",
                       movieBean.poster,
 //                package: product.assetPackage,
                       fit: BoxFit.cover,
-                    ),
+                    ),*/
                   ),
                   Align(
                     alignment: Alignment.bottomCenter,
                     child: Container(
-                      color: ColorUtil.getColorFromHex("#bb101010"),
+                      color: ColorConstant.CARBON_TRANSPARENT_BB,
+//                      ColorUtil.getColorFromHex("#bb101010"),
                       child: Padding(
                         padding: EdgeInsets.fromLTRB(16.0, 12.0, 16.0, 8.0),
                         child: Column(
@@ -299,15 +305,18 @@ class _SearchScreenState extends State<SearchScreen> {
                               textAlign: TextAlign.center,
                               style: Styles.getWhiteTextTheme(
                                   theme.textTheme.title),
-//                              maxLines: 1,
+                              textScaleFactor: .65,
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 5,
                             ),
-                            SizedBox(height: 8.0),
+                            SizedBox(height: 4.0),
                             Text(
                               "${movieBean.year}",
                               textAlign: TextAlign.center,
 //                      formatter.format(product.price),
                               style: Styles.getWhiteTextTheme(
                                   theme.textTheme.body2),
+                              textScaleFactor: .8,
                             ),
                           ],
                         ),

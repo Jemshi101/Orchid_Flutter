@@ -99,12 +99,19 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
           fit: FlexFit.loose,
           child: Padding(
             padding: EdgeInsets.fromLTRB(0, 0, 16, 0),
-            child: Image.network(
-                movieDetailResponse != null
+            child: FadeInImage.assetNetwork(
+                placeholder: "assets/images/logo.png",
+                image: movieDetailResponse != null
                     ? movieDetailResponse.poster
                     : widget.movieBean.poster,
                 fit: BoxFit.contain,
                 alignment: AlignmentDirectional.topStart),
+            /*child: Image.network(
+                movieDetailResponse != null
+                    ? movieDetailResponse.poster
+                    : widget.movieBean.poster,
+                fit: BoxFit.contain,
+                alignment: AlignmentDirectional.topStart),*/
           ),
         ),
         Flexible(
