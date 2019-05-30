@@ -41,6 +41,7 @@ class _LoginScreenState extends State<LoginScreen> {
   int _counter = 0;
 
   bool isLoggedIn = false;
+  bool isLoading = false;
 
   @override
   void dispose() {
@@ -99,7 +100,11 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Image.asset('assets/images/logo.png',
                     alignment: AlignmentDirectional.topCenter),
               ),
-              !isLoggedIn ? _getLoginLayout(context) : _navigateToSearchPage(),
+              !isLoggedIn
+                  ? isLoading
+                      ? _getLoadingLayout(context)
+                      : _getLoginLayout(context)
+                  : _navigateToSearchPage(),
             ],
           )
         ]),
@@ -110,6 +115,29 @@ class _LoginScreenState extends State<LoginScreen> {
         child: Icon(Icons.add),
       ),*/ // This trailing comma makes auto-formatting nicer for build methods.
     );
+  }
+
+  Widget _getLoadingLayout(BuildContext context) {
+    return Padding(
+        padding: EdgeInsets.all(20),
+        child: Flex(
+            direction: Axis.vertical,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(
+                backgroundColor: ColorConstant.BLACK,
+                valueColor: new AlwaysStoppedAnimation(ColorUtil('#ffffffff')),
+              ),
+              Padding(
+                padding: EdgeInsets.all(50),
+                child: Text(
+                  'Please Wait...',
+                  style: Styles.getWhiteTextTheme(
+                      Theme.of(context).textTheme.display1),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ]));
   }
 
   Flex _getLoginLayout(BuildContext context) {
@@ -215,11 +243,14 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   _onLoginPressed() {
+    setLoading(true);
     String email = _emailController.text;
     String password = _passwordController.text;
 
     if (validate(email, password)) {
       _performLogin(email, password);
+    } else {
+      setLoading(false);
     }
   }
 
@@ -241,16 +272,24 @@ class _LoginScreenState extends State<LoginScreen> {
         .signInWithEmailAndPassword(email: email, password: password)
         .then((user) {
       if (user != null) {
+        setLoading(false);
         _saveUser(user);
         _navigateToSearchPage();
       }
     }).catchError((e) {
+      setLoading(false);
       print(e);
       if (e.code == "ERROR_USER_NOT_FOUND") {
         _performSignUp(email, password);
       } else {
         _showSnackBar(e.details, Duration(seconds: 10), null);
       }
+    });
+  }
+
+  void setLoading(bool isLoadingVisible) {
+    setState(() {
+      isLoading = isLoadingVisible;
     });
   }
 
@@ -261,6 +300,8 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   _performSignUp(String email, String password) async {
+    setLoading(true);
+
     await firebaseAuth
         .createUserWithEmailAndPassword(
       email: email,
@@ -268,6 +309,7 @@ class _LoginScreenState extends State<LoginScreen> {
     )
         .then((user) {
       if (user != null) {
+        setLoading(false);
         _saveUser(user);
         _navigateToSearchPage();
       } else {
