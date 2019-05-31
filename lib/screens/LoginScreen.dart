@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'styles.dart';
+import 'package:Orchid/styles.dart';
 
 class LoginScreen extends StatefulWidget {
   LoginScreen({Key key, this.title}) : super(key: key);

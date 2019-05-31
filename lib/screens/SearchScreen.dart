@@ -6,7 +6,7 @@ import 'package:Orchid/network/models/SearchResponse.dart';
 import 'package:Orchid/utils/ColorUtil.dart';
 import 'package:flutter/material.dart';
 
-import 'styles.dart';
+import 'package:Orchid/styles.dart';
 
 String _title = "";
 double currentScrollOffset = -1;

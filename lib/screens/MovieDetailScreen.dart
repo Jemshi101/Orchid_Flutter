@@ -7,7 +7,7 @@ import 'package:Orchid/utils/ColorUtil.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
-import 'styles.dart';
+import 'package:Orchid/styles.dart';
 
 class MovieDetailScreen extends StatefulWidget {
   MovieDetailScreen(this.movieBean, {Key key, this.title}) : super(key: key);
