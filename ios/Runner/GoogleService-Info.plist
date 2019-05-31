@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>207829103854-ompdbetkjr59tvj3jmngil7dr6l5hsrm.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.207829103854-ompdbetkjr59tvj3jmngil7dr6l5hsrm</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>207829103854-j5nk0d3rqpanrdrotu3rttogdq1mjfqo.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyA9OEZ3X_JZzf3SySn_C0fZDr_3rkbipaY</string>
+	<key>GCM_SENDER_ID</key>
+	<string>207829103854</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.thinkpalm.orchid</string>
+	<key>PROJECT_ID</key>
+	<string>orchid-flutter</string>
+	<key>STORAGE_BUCKET</key>
+	<string>orchid-flutter.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:207829103854:ios:66feb8665a8ead0c</string>
+	<key>DATABASE_URL</key>
+	<string>https://orchid-flutter.firebaseio.com</string>
+</dict>
+</plist>
