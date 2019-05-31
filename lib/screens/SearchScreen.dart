@@ -1,4 +1,4 @@
-import 'package:Orchid/MovieDetailScreen.dart';
+import 'package:Orchid/screens/MovieDetailScreen.dart';
 import 'package:Orchid/constants/Colors.dart';
 import 'package:Orchid/models/MovieBean.dart';
 import 'package:Orchid/network/DataManager.dart';

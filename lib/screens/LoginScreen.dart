@@ -1,4 +1,4 @@
-import 'package:Orchid/SearchScreen.dart';
+import 'package:Orchid/screens/SearchScreen.dart';
 import 'package:Orchid/constants/Colors.dart';
 import 'package:Orchid/constants/SharedPrefKeys.dart';
 import 'package:Orchid/utils/ColorUtil.dart';

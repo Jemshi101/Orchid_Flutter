@@ -1,7 +1,7 @@
 import 'dart:developer';
 
-import 'package:Orchid/LoginScreen.dart';
-import 'package:Orchid/SearchScreen.dart';
+import 'package:Orchid/screens/LoginScreen.dart';
+import 'package:Orchid/screens/SearchScreen.dart';
 import 'package:Orchid/constants/Colors.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
