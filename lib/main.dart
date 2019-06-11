@@ -1,8 +1,9 @@
 import 'dart:developer';
+import 'dart:io';
 
+import 'package:Orchid/constants/Colors.dart';
 import 'package:Orchid/screens/LoginScreen.dart';
 import 'package:Orchid/screens/SearchScreen.dart';
-import 'package:Orchid/constants/Colors.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -103,13 +104,19 @@ class _MyHomePageState extends State<MyHomePage> {
 
   _checkForLogIn(BuildContext context) async {
 //    Future.delayed(const Duration(seconds: 5), () {
-    getUser().then((user) {
-      if (user != null) {
+    if (Platform.isAndroid || Platform.isIOS) {
+      getUser().then((user) {
+        if (user != null) {
+          _setLoggedInStatus(true);
+        } else {
+          _setLoggedInStatus(false);
+        }
+      });
+    } else {
+      Future.delayed(const Duration(seconds: 5), () {
         _setLoggedInStatus(true);
-      } else {
-        _setLoggedInStatus(false);
-      }
-    });
+      });
+    }
 //    });
 
     log("In Check For Login");
