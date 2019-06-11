@@ -5,8 +5,8 @@ import 'package:Orchid/network/DataManager.dart';
 import 'package:Orchid/network/models/MovieDetailResponse.dart';
 import 'package:Orchid/utils/ColorUtil.dart';
 import 'package:flutter/material.dart';
+//import 'package:flutter_web/material.dart';
 import 'package:flutter/scheduler.dart';
-
 import 'package:Orchid/styles.dart';
 
 class MovieDetailScreen extends StatefulWidget {

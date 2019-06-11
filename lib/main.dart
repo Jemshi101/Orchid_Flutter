@@ -1,5 +1,7 @@
 import 'dart:developer';
 import 'dart:io';
+import 'dart:io' show Platform;
+import 'package:flutter/foundation.dart' show debugDefaultTargetPlatformOverride;
 
 import 'package:Orchid/constants/Colors.dart';
 import 'package:Orchid/screens/LoginScreen.dart';
@@ -17,8 +19,24 @@ void main() {
 //  isLoggedIn = await _checkForLogIn();
 //  _checkForLogIn();
 
+  _setTargetPlatformForDesktop();
   runApp(MyApp());
 }
+
+void _setTargetPlatformForDesktop() {
+
+  TargetPlatform targetPlatform;
+  if (Platform.isMacOS) {
+    targetPlatform = TargetPlatform.iOS;
+  } else if (Platform.isLinux || Platform.isWindows) {
+//    targetPlatform = TargetPlatform.android;
+    targetPlatform = TargetPlatform.fuchsia;
+  }
+  if (targetPlatform != null) {
+    debugDefaultTargetPlatformOverride = targetPlatform;
+  }
+}
+
 
 /*_checkForLogIn() async {
   getUser().then((user) {
@@ -113,7 +131,7 @@ class _MyHomePageState extends State<MyHomePage> {
         }
       });
     } else {
-      Future.delayed(const Duration(seconds: 5), () {
+      Future.delayed(const Duration(seconds: 4), () {
         _setLoggedInStatus(true);
       });
     }
