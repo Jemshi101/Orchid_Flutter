@@ -27,7 +27,8 @@ void _setTargetPlatformForDesktop() {
 
   TargetPlatform targetPlatform;
   if (Platform.isMacOS) {
-    targetPlatform = TargetPlatform.iOS;
+//    targetPlatform = TargetPlatform.iOS;
+    targetPlatform = TargetPlatform.fuchsia;
   } else if (Platform.isLinux || Platform.isWindows) {
 //    targetPlatform = TargetPlatform.android;
     targetPlatform = TargetPlatform.fuchsia;
