@@ -1,12 +1,12 @@
-import 'package:Orchid/screens/MovieDetailScreen.dart';
 import 'package:Orchid/constants/Colors.dart';
 import 'package:Orchid/models/MovieBean.dart';
 import 'package:Orchid/network/DataManager.dart';
 import 'package:Orchid/network/models/SearchResponse.dart';
-import 'package:Orchid/utils/ColorUtil.dart';
-import 'package:flutter/material.dart';
-
+import 'package:Orchid/screens/MovieDetailScreen.dart';
 import 'package:Orchid/styles.dart';
+import 'package:Orchid/utils/ColorUtil.dart';
+import 'package:Orchid/utils/DisplayUtil.dart';
+import 'package:flutter/material.dart';
 
 String _title = "";
 double currentScrollOffset = -1;
@@ -53,7 +53,7 @@ class _SearchScreenState extends State<SearchScreen> {
     currentScrollOffset = _scrollController.offset;
 
     if (_scrollController.offset >=
-            _scrollController.position.maxScrollExtent &&
+        _scrollController.position.maxScrollExtent &&
         !_scrollController.position.outOfRange) {
       if (_currentSearchResponse != null &&
           _currentSearchResponse.movieList.length <
@@ -62,7 +62,7 @@ class _SearchScreenState extends State<SearchScreen> {
       //          message = "reach the bottom";
     }
     if (_scrollController.offset <=
-            _scrollController.position.minScrollExtent &&
+        _scrollController.position.minScrollExtent &&
         !_scrollController.position.outOfRange) {
       //          message = "reach the top";
     }
@@ -110,8 +110,8 @@ class _SearchScreenState extends State<SearchScreen> {
               isLoading
                   ? _getLoadingLayout(context)
                   : isEmptyList
-                      ? _getNoResultLayout(context)
-                      : _getMovieGridLayout(context)
+                  ? _getNoResultLayout(context)
+                  : _getMovieGridLayout(context)
             ],
           ),
         ],
@@ -141,7 +141,10 @@ class _SearchScreenState extends State<SearchScreen> {
                   autofocus: false,
                   controller: _searchController,
                   style: Styles.getWhiteTextTheme(
-                      Theme.of(context).textTheme.title),
+                      Theme
+                          .of(context)
+                          .textTheme
+                          .title),
                   decoration: InputDecoration(
                       labelStyle: TextStyle(
                           color: ColorUtil.getColorFromHex("#bbffffff")),
@@ -174,14 +177,17 @@ class _SearchScreenState extends State<SearchScreen> {
                     CircularProgressIndicator(
                       backgroundColor: ColorConstant.BLACK,
                       valueColor:
-                          new AlwaysStoppedAnimation(ColorUtil('#ffffffff')),
+                      new AlwaysStoppedAnimation(ColorUtil('#ffffffff')),
                     ),
                     Padding(
                       padding: EdgeInsets.all(50),
                       child: Text(
                         'Please Wait...',
                         style: Styles.getWhiteTextTheme(
-                            Theme.of(context).textTheme.display1),
+                            Theme
+                                .of(context)
+                                .textTheme
+                                .display1),
                         textAlign: TextAlign.center,
                       ),
                     ),
@@ -213,7 +219,10 @@ class _SearchScreenState extends State<SearchScreen> {
               child: Text(
                 'No Movies Found!!!',
                 style: Styles.getWhiteTextTheme(
-                    Theme.of(context).textTheme.display1),
+                    Theme
+                        .of(context)
+                        .textTheme
+                        .display1),
                 textAlign: TextAlign.center,
                 textScaleFactor: .7,
               ),
@@ -237,7 +246,9 @@ class _SearchScreenState extends State<SearchScreen> {
     return Flexible(
       flex: 1,
       child: GridView.count(
-        crossAxisCount: 2,
+        crossAxisCount: (DisplayUtil.getDisplayWidth(context) ~/ 160) > 1
+            ? DisplayUtil.getDisplayWidth(context) ~/ 160
+            : 1,
         padding: EdgeInsets.all(16.0),
         childAspectRatio: 8.0 / 9.0,
         children: _buildGridCards(context),
@@ -271,7 +282,7 @@ class _SearchScreenState extends State<SearchScreen> {
               _navigateToMovieDetailPage(movieBean);
             },
             child: Stack(
-                // TODO: Center items on the card (103)
+              // TODO: Center items on the card (103)
                 alignment: AlignmentDirectional.topCenter,
                 children: <Widget>[
                   AspectRatio(
@@ -332,7 +343,8 @@ class _SearchScreenState extends State<SearchScreen> {
 
   _navigateToMovieDetailPage(MovieBean movieBean) {
     Route route = MaterialPageRoute(
-        builder: (context) => MovieDetailScreen(
+        builder: (context) =>
+            MovieDetailScreen(
               movieBean,
               title: movieBean.title,
             ));
