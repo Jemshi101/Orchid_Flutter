@@ -52,8 +52,9 @@ class _SearchScreenState extends State<SearchScreen> {
   void _scrollListener() {
     currentScrollOffset = _scrollController.offset;
 
-    if (_scrollController.offset >=
-        _scrollController.position.maxScrollExtent &&
+//    if (_scrollController.offset >=
+    if (_scrollController.position.pixels >=
+            _scrollController.position.maxScrollExtent &&
         !_scrollController.position.outOfRange) {
       if (_currentSearchResponse != null &&
           _currentSearchResponse.movieList.length <
@@ -62,7 +63,7 @@ class _SearchScreenState extends State<SearchScreen> {
       //          message = "reach the bottom";
     }
     if (_scrollController.offset <=
-        _scrollController.position.minScrollExtent &&
+            _scrollController.position.minScrollExtent &&
         !_scrollController.position.outOfRange) {
       //          message = "reach the top";
     }
@@ -110,8 +111,8 @@ class _SearchScreenState extends State<SearchScreen> {
               isLoading
                   ? _getLoadingLayout(context)
                   : isEmptyList
-                  ? _getNoResultLayout(context)
-                  : _getMovieGridLayout(context)
+                      ? _getNoResultLayout(context)
+                      : _getMovieGridLayout(context)
             ],
           ),
         ],
@@ -141,10 +142,7 @@ class _SearchScreenState extends State<SearchScreen> {
                   autofocus: false,
                   controller: _searchController,
                   style: Styles.getWhiteTextTheme(
-                      Theme
-                          .of(context)
-                          .textTheme
-                          .title),
+                      Theme.of(context).textTheme.title),
                   decoration: InputDecoration(
                       labelStyle: TextStyle(
                           color: ColorUtil.getColorFromHex("#bbffffff")),
@@ -177,17 +175,14 @@ class _SearchScreenState extends State<SearchScreen> {
                     CircularProgressIndicator(
                       backgroundColor: ColorConstant.BLACK,
                       valueColor:
-                      new AlwaysStoppedAnimation(ColorUtil('#ffffffff')),
+                          new AlwaysStoppedAnimation(ColorUtil('#ffffffff')),
                     ),
                     Padding(
                       padding: EdgeInsets.all(50),
                       child: Text(
                         'Please Wait...',
                         style: Styles.getWhiteTextTheme(
-                            Theme
-                                .of(context)
-                                .textTheme
-                                .display1),
+                            Theme.of(context).textTheme.display1),
                         textAlign: TextAlign.center,
                       ),
                     ),
@@ -219,10 +214,7 @@ class _SearchScreenState extends State<SearchScreen> {
               child: Text(
                 'No Movies Found!!!',
                 style: Styles.getWhiteTextTheme(
-                    Theme
-                        .of(context)
-                        .textTheme
-                        .display1),
+                    Theme.of(context).textTheme.display1),
                 textAlign: TextAlign.center,
                 textScaleFactor: .7,
               ),
@@ -282,7 +274,7 @@ class _SearchScreenState extends State<SearchScreen> {
               _navigateToMovieDetailPage(movieBean);
             },
             child: Stack(
-              // TODO: Center items on the card (103)
+                // TODO: Center items on the card (103)
                 alignment: AlignmentDirectional.topCenter,
                 children: <Widget>[
                   AspectRatio(
@@ -311,14 +303,18 @@ class _SearchScreenState extends State<SearchScreen> {
                           mainAxisSize: MainAxisSize.min,
                           children: <Widget>[
                             // TODO: Handle overflowing labels (103)
-                            Text(
-                              movieBean.title,
-                              textAlign: TextAlign.center,
-                              style: Styles.getWhiteTextTheme(
-                                  theme.textTheme.title),
-                              textScaleFactor: .65,
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 5,
+                            Flexible(
+                              flex: 1,
+                              fit: FlexFit.loose,
+                              child: Text(
+                                movieBean.title,
+                                textAlign: TextAlign.center,
+                                style: Styles.getWhiteTextTheme(
+                                    theme.textTheme.title),
+                                textScaleFactor: .65,
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 5,
+                              ),
                             ),
                             SizedBox(height: 4.0),
                             Text(
@@ -343,8 +339,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
   _navigateToMovieDetailPage(MovieBean movieBean) {
     Route route = MaterialPageRoute(
-        builder: (context) =>
-            MovieDetailScreen(
+        builder: (context) => MovieDetailScreen(
               movieBean,
               title: movieBean.title,
             ));
@@ -375,6 +370,12 @@ class _SearchScreenState extends State<SearchScreen> {
               .addAll((value.responseBody as SearchResponse).movieList);
         }
 
+        if ((_currentPage <= 4) &&
+            _currentSearchResponse.movieList.length <
+                num.parse(_currentSearchResponse.totalResults)) {
+          _onSearchParamChanged(_searchController.text, false);
+        }
+
         setState(() {
           if (_currentSearchResponse == null ||
               _currentSearchResponse.movieList.isEmpty) {
@@ -385,6 +386,9 @@ class _SearchScreenState extends State<SearchScreen> {
           isLoading = false;
         });
       }).catchError((error) {
+        if (_currentPage > 1) {
+          _currentPage--;
+        }
         setState(() {
           if (_currentSearchResponse == null ||
               _currentSearchResponse.movieList.isEmpty) {
