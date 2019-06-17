@@ -277,64 +277,78 @@ class _SearchScreenState extends State<SearchScreen> {
                 // TODO: Center items on the card (103)
                 alignment: AlignmentDirectional.topCenter,
                 children: <Widget>[
-                  AspectRatio(
-                    aspectRatio: 8 / 9,
-                    child: FadeInImage.assetNetwork(
-                      placeholder: "assets/images/little-dino.jpg",
-                      image: movieBean.poster,
-                      fit: BoxFit.cover,
-                    ),
-                    /*child: Image.network(
-//                "assets/images/Robot.png",
-                      movieBean.poster,
-//                package: product.assetPackage,
-                      fit: BoxFit.cover,
-                    ),*/
-                  ),
-                  Align(
-                    alignment: Alignment.bottomCenter,
-                    child: Container(
-                      color: ColorConstant.CARBON_TRANSPARENT_BB,
-//                      ColorUtil.getColorFromHex("#bb101010"),
-                      child: Padding(
-                        padding: EdgeInsets.fromLTRB(16.0, 12.0, 16.0, 8.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          mainAxisSize: MainAxisSize.min,
-                          children: <Widget>[
-                            // TODO: Handle overflowing labels (103)
-                            Flexible(
-                              flex: 1,
-                              fit: FlexFit.loose,
-                              child: Text(
-                                movieBean.title,
-                                textAlign: TextAlign.center,
-                                style: Styles.getWhiteTextTheme(
-                                    theme.textTheme.title),
-                                textScaleFactor: .65,
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 5,
-                              ),
-                            ),
-                            SizedBox(height: 4.0),
-                            Text(
-                              "${movieBean.year}",
-                              textAlign: TextAlign.center,
-//                      formatter.format(product.price),
-                              style: Styles.getWhiteTextTheme(
-                                  theme.textTheme.body2),
-                              textScaleFactor: .8,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  )
+                  _getMovieItemImage(movieBean),
+                  _getMovieItemTitleOverlay(movieBean, theme)
                 ]),
           ),
         ),
       );
     }).toList();
+  }
+
+  Widget _getMovieItemTitleOverlay(MovieBean movieBean, ThemeData theme) {
+    return Align(
+      alignment: Alignment.bottomCenter,
+      child: Container(
+        color: ColorConstant.CARBON_TRANSPARENT_BB,
+//                      ColorUtil.getColorFromHex("#bb101010"),
+        child: Padding(
+          padding: EdgeInsets.fromLTRB(16.0, 12.0, 16.0, 8.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              // TODO: Handle overflowing labels (103)
+              _getMovieItemTitle(movieBean, theme),
+              SizedBox(height: 4.0),
+              _getMovieItemYear(movieBean, theme),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _getMovieItemImage(MovieBean movieBean) {
+    return AspectRatio(
+      aspectRatio: 8 / 9,
+      child: FadeInImage.assetNetwork(
+        placeholder: "assets/images/little-dino.jpg",
+        image: movieBean.poster,
+        fit: BoxFit.cover,
+      ),
+      /*child: Image.network(
+//                "assets/images/Robot.png",
+                    movieBean.poster,
+//                package: product.assetPackage,
+                    fit: BoxFit.cover,
+                  ),*/
+    );
+  }
+
+  Widget _getMovieItemTitle(MovieBean movieBean, ThemeData theme) {
+    return Flexible(
+      flex: 1,
+      fit: FlexFit.loose,
+      child: Text(
+        movieBean.title,
+        textAlign: TextAlign.center,
+        style: Styles.getWhiteTextTheme(theme.textTheme.title),
+        textScaleFactor: .65,
+        overflow: TextOverflow.ellipsis,
+        maxLines: 5,
+      ),
+    );
+  }
+
+  Widget _getMovieItemYear(MovieBean movieBean, ThemeData theme) {
+    return Text(
+      "${movieBean.year}",
+      textAlign: TextAlign.center,
+//                      formatter.format(product.price),
+      style: Styles.getWhiteTextTheme(theme.textTheme.body2),
+      textScaleFactor: .8,
+    );
   }
 
   _navigateToMovieDetailPage(MovieBean movieBean) {
