@@ -1,8 +1,8 @@
 import "dart:async";
 
-import 'package:Orchid/network/APIUrl.dart';
-import 'package:Orchid/network/models/MovieDetailResponse.dart';
-import 'package:Orchid/network/models/SearchResponse.dart';
+import 'package:Orchid/src/network/APIUrl.dart';
+import 'package:Orchid/src/network/models/MovieDetailResponse.dart';
+import 'package:Orchid/src/network/models/SearchResponse.dart';
 import 'package:chopper/chopper.dart';
 
 part "API.chopper.dart";

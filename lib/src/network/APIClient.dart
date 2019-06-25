@@ -1,7 +1,7 @@
 
 
-import 'package:Orchid/network/API.dart';
-import 'package:Orchid/network/APIUrl.dart';
+import 'package:Orchid/src/network/API.dart';
+import 'package:Orchid/src/network/APIUrl.dart';
 import 'package:chopper/chopper.dart';
 
 class APIClient {

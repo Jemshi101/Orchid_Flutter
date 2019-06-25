@@ -1,13 +1,13 @@
-import 'package:Orchid/screens/SearchScreen.dart';
-import 'package:Orchid/constants/Colors.dart';
-import 'package:Orchid/constants/SharedPrefKeys.dart';
-import 'package:Orchid/utils/ColorUtil.dart';
+import 'package:Orchid/src/screens/SearchScreen.dart';
+import 'package:Orchid/src/constants/Colors.dart';
+import 'package:Orchid/src/constants/SharedPrefKeys.dart';
+import 'package:Orchid/src/utils/ColorUtil.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:Orchid/styles.dart';
+import 'package:Orchid/src/styles.dart';
 
 class LoginScreen extends StatefulWidget {
   LoginScreen({Key key, this.title}) : super(key: key);

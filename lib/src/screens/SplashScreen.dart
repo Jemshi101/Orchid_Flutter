@@ -2,14 +2,14 @@ import 'dart:developer';
 import 'dart:io';
 import 'dart:io' show Platform;
 
-import 'package:Orchid/constants/Colors.dart';
-import 'package:Orchid/screens/LoginScreen.dart';
-import 'package:Orchid/screens/SearchScreen.dart';
+import 'package:Orchid/src/constants/Colors.dart';
+import 'package:Orchid/src/screens/LoginScreen.dart';
+import 'package:Orchid/src/screens/SearchScreen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
-import 'package:Orchid/styles.dart';
+import 'package:Orchid/src/styles.dart';
 
 class SplashScreen extends StatefulWidget {
   SplashScreen({Key key, this.title}) : super(key: key);
@@ -168,7 +168,7 @@ class _SplashScreenState extends State<SplashScreen> {
       children: [
         CircularProgressIndicator(
           backgroundColor: ColorConstant.BLACK,
-          valueColor: new AlwaysStoppedAnimation(ColorConstant.OLAKKA),
+          valueColor: new AlwaysStoppedAnimation(ColorConstant.COLOR_PRIMARY),
         ),
         Padding(
           padding: EdgeInsets.all(50),

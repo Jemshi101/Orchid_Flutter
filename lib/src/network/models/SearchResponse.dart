@@ -1,5 +1,5 @@
-import 'package:Orchid/network/models/BaseResponse.dart';
-import 'package:Orchid/models/MovieBean.dart';
+import 'package:Orchid/src/network/models/BaseResponse.dart';
+import 'package:Orchid/src/models/MovieBean.dart';
 
 class SearchResponse with BaseResponse {
 

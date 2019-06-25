@@ -1,13 +1,13 @@
-import 'package:Orchid/constants/AppConstants.dart';
-import 'package:Orchid/constants/Colors.dart';
-import 'package:Orchid/models/MovieBean.dart';
-import 'package:Orchid/network/DataManager.dart';
-import 'package:Orchid/network/models/MovieDetailResponse.dart';
-import 'package:Orchid/utils/ColorUtil.dart';
+import 'package:Orchid/src/constants/AppConstants.dart';
+import 'package:Orchid/src/constants/Colors.dart';
+import 'package:Orchid/src/models/MovieBean.dart';
+import 'package:Orchid/src/network/DataManager.dart';
+import 'package:Orchid/src/network/models/MovieDetailResponse.dart';
+import 'package:Orchid/src/utils/ColorUtil.dart';
 import 'package:flutter/material.dart';
 //import 'package:flutter_web/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:Orchid/styles.dart';
+import 'package:Orchid/src/styles.dart';
 
 class MovieDetailScreen extends StatefulWidget {
   MovieDetailScreen(this.movieBean, {Key key, this.title}) : super(key: key);
@@ -143,7 +143,7 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
         Text(
           'Year : ',
           style: Styles.getColoredTextTheme(
-              Theme.of(context).textTheme.subtitle, ColorConstant.OLAKKA),
+              Theme.of(context).textTheme.subtitle, ColorConstant.COLOR_PRIMARY),
           textAlign: TextAlign.start,
         ),
         Text(
@@ -166,7 +166,7 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
           Text(
             'Genre : ',
             style: Styles.getColoredTextTheme(
-                Theme.of(context).textTheme.subtitle, ColorConstant.OLAKKA),
+                Theme.of(context).textTheme.subtitle, ColorConstant.COLOR_PRIMARY),
             textAlign: TextAlign.start,
           ),
           Text(
@@ -190,7 +190,7 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
           Text(
             'Language : ',
             style: Styles.getColoredTextTheme(
-                Theme.of(context).textTheme.subtitle, ColorConstant.OLAKKA),
+                Theme.of(context).textTheme.subtitle, ColorConstant.COLOR_PRIMARY),
             textAlign: TextAlign.start,
           ),
           Text(
@@ -214,7 +214,7 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
           Text(
             'Rating : ',
             style: Styles.getColoredTextTheme(
-                Theme.of(context).textTheme.subtitle, ColorConstant.OLAKKA),
+                Theme.of(context).textTheme.subtitle, ColorConstant.COLOR_PRIMARY),
             textAlign: TextAlign.start,
           ),
           Text(
@@ -238,7 +238,7 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
           Text(
             'Votes : ',
             style: Styles.getColoredTextTheme(
-                Theme.of(context).textTheme.subtitle, ColorConstant.OLAKKA),
+                Theme.of(context).textTheme.subtitle, ColorConstant.COLOR_PRIMARY),
             textAlign: TextAlign.start,
           ),
           Text(
@@ -278,7 +278,7 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
         Text(
           'Title : ',
           style: Styles.getColoredTextTheme(
-              Theme.of(context).textTheme.subtitle, ColorConstant.OLAKKA),
+              Theme.of(context).textTheme.subtitle, ColorConstant.COLOR_PRIMARY),
           textAlign: TextAlign.start,
         ),
         Text(
@@ -299,7 +299,7 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
           Text(
             'Plot Summary : ',
             style: Styles.getColoredTextTheme(
-                Theme.of(context).textTheme.subtitle, ColorConstant.OLAKKA),
+                Theme.of(context).textTheme.subtitle, ColorConstant.COLOR_PRIMARY),
             textAlign: TextAlign.start,
           ),
           Text(
@@ -322,7 +322,7 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
           Text(
             'Director : ',
             style: Styles.getColoredTextTheme(
-                Theme.of(context).textTheme.subtitle, ColorConstant.OLAKKA),
+                Theme.of(context).textTheme.subtitle, ColorConstant.COLOR_PRIMARY),
             textAlign: TextAlign.start,
           ),
           Text(
@@ -345,7 +345,7 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
           Text(
             'Cast : ',
             style: Styles.getColoredTextTheme(
-                Theme.of(context).textTheme.subtitle, ColorConstant.OLAKKA),
+                Theme.of(context).textTheme.subtitle, ColorConstant.COLOR_PRIMARY),
             textAlign: TextAlign.start,
           ),
           Text(
@@ -368,7 +368,7 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
           Text(
             'Writer : ',
             style: Styles.getColoredTextTheme(
-                Theme.of(context).textTheme.subtitle, ColorConstant.OLAKKA),
+                Theme.of(context).textTheme.subtitle, ColorConstant.COLOR_PRIMARY),
             textAlign: TextAlign.start,
           ),
           Text(
@@ -391,7 +391,7 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
           Text(
             'Website : ',
             style: Styles.getColoredTextTheme(
-                Theme.of(context).textTheme.subtitle, ColorConstant.OLAKKA),
+                Theme.of(context).textTheme.subtitle, ColorConstant.COLOR_PRIMARY),
             textAlign: TextAlign.start,
           ),
           Text(
@@ -414,7 +414,7 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
           Text(
             'Awards : ',
             style: Styles.getColoredTextTheme(
-                Theme.of(context).textTheme.subtitle, ColorConstant.OLAKKA),
+                Theme.of(context).textTheme.subtitle, ColorConstant.COLOR_PRIMARY),
             textAlign: TextAlign.start,
           ),
           Text(
@@ -437,7 +437,7 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
           Text(
             'Runtime : ',
             style: Styles.getColoredTextTheme(
-                Theme.of(context).textTheme.subtitle, ColorConstant.OLAKKA),
+                Theme.of(context).textTheme.subtitle, ColorConstant.COLOR_PRIMARY),
             textAlign: TextAlign.start,
           ),
           Text(
@@ -460,7 +460,7 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
           Text(
             'Released : ',
             style: Styles.getColoredTextTheme(
-                Theme.of(context).textTheme.subtitle, ColorConstant.OLAKKA),
+                Theme.of(context).textTheme.subtitle, ColorConstant.COLOR_PRIMARY),
             textAlign: TextAlign.start,
           ),
           Text(
@@ -483,7 +483,7 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
           Text(
             'Box Office : ',
             style: Styles.getColoredTextTheme(
-                Theme.of(context).textTheme.subtitle, ColorConstant.OLAKKA),
+                Theme.of(context).textTheme.subtitle, ColorConstant.COLOR_PRIMARY),
             textAlign: TextAlign.start,
           ),
           Text(
@@ -506,7 +506,7 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
           Text(
             'Production : ',
             style: Styles.getColoredTextTheme(
-                Theme.of(context).textTheme.subtitle, ColorConstant.OLAKKA),
+                Theme.of(context).textTheme.subtitle, ColorConstant.COLOR_PRIMARY),
             textAlign: TextAlign.start,
           ),
           Text(
@@ -529,7 +529,7 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
           Text(
             'Rated : ',
             style: Styles.getColoredTextTheme(
-                Theme.of(context).textTheme.subtitle, ColorConstant.OLAKKA),
+                Theme.of(context).textTheme.subtitle, ColorConstant.COLOR_PRIMARY),
             textAlign: TextAlign.start,
           ),
           Text(
@@ -552,7 +552,7 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
           Text(
             'Country : ',
             style: Styles.getColoredTextTheme(
-                Theme.of(context).textTheme.subtitle, ColorConstant.OLAKKA),
+                Theme.of(context).textTheme.subtitle, ColorConstant.COLOR_PRIMARY),
             textAlign: TextAlign.start,
           ),
           Text(

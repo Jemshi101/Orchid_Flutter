@@ -1,4 +1,4 @@
-import 'package:Orchid/models/Ratings.dart';
+import 'package:Orchid/src/models/Ratings.dart';
 
 class MovieDetailResponse {
   List<Ratings> ratings = List();

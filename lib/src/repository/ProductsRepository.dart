@@ -13,7 +13,7 @@
 // limitations under the License.
 
 
-import 'package:Orchid/models/Category.dart';
+import 'package:Orchid/src/models/Category.dart';
 
 class ProductsRepository {
   static List<Product> loadProducts(Category category) {

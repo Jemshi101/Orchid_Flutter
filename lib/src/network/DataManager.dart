@@ -1,10 +1,10 @@
-import 'package:Orchid/network/API.dart';
-import 'package:Orchid/network/APIClient.dart';
-import 'package:Orchid/network/APIUrl.dart';
-import 'package:Orchid/network/models/BaseResponse.dart';
-import 'package:Orchid/network/models/DataManagerBean.dart';
-import 'package:Orchid/network/models/MovieDetailResponse.dart';
-import 'package:Orchid/network/models/SearchResponse.dart';
+import 'package:Orchid/src/network/API.dart';
+import 'package:Orchid/src/network/APIClient.dart';
+import 'package:Orchid/src/network/APIUrl.dart';
+import 'package:Orchid/src/network/models/BaseResponse.dart';
+import 'package:Orchid/src/network/models/DataManagerBean.dart';
+import 'package:Orchid/src/network/models/MovieDetailResponse.dart';
+import 'package:Orchid/src/network/models/SearchResponse.dart';
 
 class DataManager {
   static API apiInstance;

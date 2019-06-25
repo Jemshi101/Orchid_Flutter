@@ -1,11 +1,11 @@
-import 'package:Orchid/constants/Colors.dart';
-import 'package:Orchid/models/MovieBean.dart';
-import 'package:Orchid/network/DataManager.dart';
-import 'package:Orchid/network/models/SearchResponse.dart';
-import 'package:Orchid/screens/MovieDetailScreen.dart';
-import 'package:Orchid/styles.dart';
-import 'package:Orchid/utils/ColorUtil.dart';
-import 'package:Orchid/utils/DisplayUtil.dart';
+import 'package:Orchid/src/constants/Colors.dart';
+import 'package:Orchid/src/models/MovieBean.dart';
+import 'package:Orchid/src/network/DataManager.dart';
+import 'package:Orchid/src/network/models/SearchResponse.dart';
+import 'package:Orchid/src/screens/MovieDetailScreen.dart';
+import 'package:Orchid/src/styles.dart';
+import 'package:Orchid/src/utils/ColorUtil.dart';
+import 'package:Orchid/src/utils/DisplayUtil.dart';
 import 'package:flutter/material.dart';
 
 String _title = "";
