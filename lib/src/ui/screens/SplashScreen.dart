@@ -3,13 +3,14 @@ import 'dart:io';
 import 'dart:io' show Platform;
 
 import 'package:Orchid/src/constants/Colors.dart';
-import 'package:Orchid/src/screens/LoginScreen.dart';
-import 'package:Orchid/src/screens/SearchScreen.dart';
+import 'package:Orchid/src/styles.dart';
+import 'package:Orchid/src/ui/BloC/SearchBloc.dart';
+import 'package:Orchid/src/ui/screens/LoginScreen.dart';
+import 'package:Orchid/src/ui/screens/SearchScreen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-
-import 'package:Orchid/src/styles.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class SplashScreen extends StatefulWidget {
   SplashScreen({Key key, this.title}) : super(key: key);
@@ -41,13 +42,13 @@ class _SplashScreenState extends State<SplashScreen> {
 
   void _setLoggedInStatus(bool isLoggedIn) {
     SchedulerBinding.instance.addPostFrameCallback((_) => setState(() {
-      this.isLoggedIn = isLoggedIn;
-      isInit = false;
+          this.isLoggedIn = isLoggedIn;
+          isInit = false;
 
-      Future.delayed(const Duration(seconds: 2), () {
-        _processLogIn();
-      });
-    }));
+          Future.delayed(const Duration(seconds: 2), () {
+            _processLogIn();
+          });
+        }));
   }
 
   void initState() {
@@ -175,7 +176,7 @@ class _SplashScreenState extends State<SplashScreen> {
           child: Text(
             'Please Wait...',
             style:
-            Styles.getWhiteTextTheme(Theme.of(context).textTheme.display1),
+                Styles.getWhiteTextTheme(Theme.of(context).textTheme.display1),
             textAlign: TextAlign.center,
           ),
         ),
@@ -185,7 +186,12 @@ class _SplashScreenState extends State<SplashScreen> {
 
   _navigateToSearchPage(BuildContext context) {
     Route route =
-    MaterialPageRoute(builder: (context) => SearchScreen("Orchid"));
+//    MaterialPageRoute(builder: (context) => SearchScreen("Orchid"));
+        MaterialPageRoute(
+            builder: (context) => BlocProvider<SearchBloc>(
+                  builder: (context) => SearchBloc(),
+                  child: SearchScreen("Orchid"),
+                ));
     Navigator.pushReplacement(context, route);
   }
 

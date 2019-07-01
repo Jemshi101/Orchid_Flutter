@@ -2,11 +2,14 @@ import 'package:Orchid/src/constants/Colors.dart';
 import 'package:Orchid/src/models/MovieBean.dart';
 import 'package:Orchid/src/network/DataManager.dart';
 import 'package:Orchid/src/network/models/SearchResponse.dart';
-import 'package:Orchid/src/screens/MovieDetailScreen.dart';
 import 'package:Orchid/src/styles.dart';
+import 'package:Orchid/src/ui/BloC/SearchBloc.dart';
+import 'package:Orchid/src/ui/core/BaseState.dart';
+import 'package:Orchid/src/ui/screens/MovieDetailScreen.dart';
 import 'package:Orchid/src/utils/ColorUtil.dart';
 import 'package:Orchid/src/utils/DisplayUtil.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 String _title = "";
 double currentScrollOffset = -1;
@@ -20,7 +23,7 @@ class SearchScreen extends StatefulWidget {
   _SearchScreenState createState() => _SearchScreenState();
 }
 
-class _SearchScreenState extends State<SearchScreen> {
+class _SearchScreenState extends BaseState<SearchScreen> {
   final _searchController = TextEditingController();
   ScrollController _scrollController;
 
@@ -69,20 +72,10 @@ class _SearchScreenState extends State<SearchScreen> {
     }
   }
 
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-      isLoading = !isLoading;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
+    final SearchBloc _bloc = BlocProvider.of<SearchBloc>(context);
+
     // This method is rerun every time setState is called, for instance as done
     // by the _incrementCounter method above.
     //
@@ -108,11 +101,15 @@ class _SearchScreenState extends State<SearchScreen> {
 //              if (isLoading) LinearProgressIndicator(),
               _getSearchBoxLayout(context),
 //              _getMovieGridLayout(context),
-              isLoading
-                  ? _getLoadingLayout(context)
-                  : isEmptyList
-                      ? _getNoResultLayout(context)
-                      : _getMovieGridLayout(context)
+              BlocBuilder(
+                  bloc: _bloc,
+                  builder: (context, isLoading) {
+                    return isLoading
+                        ? _getLoadingLayout(context)
+                        : isEmptyList
+                            ? _getNoResultLayout(context)
+                            : _getMovieGridLayout(context);
+                  }),
             ],
           ),
         ],

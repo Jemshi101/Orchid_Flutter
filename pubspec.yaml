@@ -27,6 +27,10 @@ dependencies:
   firebase_auth: ^0.11.1+7
   chopper: ^2.0.0
 
+  # BLoC Pattern
+  bloc: ^0.14.0
+  flutter_bloc: ^0.18.0
+
 dev_dependencies:
   build_runner: ^1.0.0
   chopper_generator: ^2.0.0

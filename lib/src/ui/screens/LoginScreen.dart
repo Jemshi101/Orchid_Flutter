@@ -1,4 +1,5 @@
-import 'package:Orchid/src/screens/SearchScreen.dart';
+import 'package:Orchid/src/ui/core/BaseState.dart';
+import 'package:Orchid/src/ui/screens/SearchScreen.dart';
 import 'package:Orchid/src/constants/Colors.dart';
 import 'package:Orchid/src/constants/SharedPrefKeys.dart';
 import 'package:Orchid/src/utils/ColorUtil.dart';
@@ -27,8 +28,7 @@ class LoginScreen extends StatefulWidget {
   _LoginScreenState createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
-  final _scaffoldKey = new GlobalKey<ScaffoldState>();
+class _LoginScreenState extends BaseState<LoginScreen> {
 
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -78,7 +78,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: _scaffoldKey,
+      key: scaffoldKey,
       /*appBar: AppBar(
         // Here we take the value from the LoginScreen object that was created by
         // the App.build method, and use it to set our appbar title.
@@ -156,7 +156,7 @@ class _LoginScreenState extends State<LoginScreen> {
               focusNode: _emailFocus,
               controller: _emailController,
               onSubmitted: (text) {
-                _fieldFocusChange(context, _emailFocus, _passwordFocus);
+                fieldFocusChange(context, _emailFocus, _passwordFocus);
               },
               style:
                   Styles.getWhiteTextTheme(Theme.of(context).textTheme.title),
@@ -256,12 +256,12 @@ class _LoginScreenState extends State<LoginScreen> {
 
   bool validate(String email, String password) {
     if (email.isEmpty) {
-      _showSnackBar(
+      showSnackBar(
           "Please Enter the Email Address", Duration(seconds: 5), null);
       return false;
     }
     if (password.isEmpty || password.length < 8) {
-      _showSnackBar("Please Enter the Password", Duration(seconds: 5), null);
+      showSnackBar("Please Enter the Password", Duration(seconds: 5), null);
       return false;
     }
     return true;
@@ -282,7 +282,7 @@ class _LoginScreenState extends State<LoginScreen> {
       if (e.code == "ERROR_USER_NOT_FOUND") {
         _performSignUp(email, password);
       } else {
-        _showSnackBar(e.details, Duration(seconds: 10), null);
+        showSnackBar(e.details, Duration(seconds: 10), null);
       }
     });
   }
@@ -313,36 +313,13 @@ class _LoginScreenState extends State<LoginScreen> {
         _saveUser(user);
         _navigateToSearchPage();
       } else {
-        _showSnackBar("User registration failed. Please try again later!!!!",
+        showSnackBar("User registration failed. Please try again later!!!!",
             Duration(seconds: 5), null);
       }
     }).catchError((e) {
-      _showSnackBar(e.details, Duration(seconds: 10), null);
+      showSnackBar(e.details, Duration(seconds: 10), null);
     });
   }
 
-  _fieldFocusChange(
-      BuildContext context, FocusNode currentFocus, FocusNode nextFocus) {
-    currentFocus.unfocus();
-    FocusScope.of(context).requestFocus(nextFocus);
-  }
-
-  _showSnackBar(String message, Duration time, SnackBarAction action) {
-    var snackBar;
-    if (action == null) {
-      snackBar = SnackBar(
-        content: Text(message),
-        duration: time,
-      );
-    } else {
-      snackBar = SnackBar(
-        content: Text(message),
-        action: action,
-        duration: time,
-      );
-    }
-
-    // Find the Scaffold in the Widget tree and use it to show a SnackBar!
-    _scaffoldKey.currentState.showSnackBar(snackBar);
-  }
+  
 }

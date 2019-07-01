@@ -3,7 +3,7 @@ import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart' show debugDefaultTargetPlatformOverride;
 import 'package:flutter/material.dart';
 
-import 'src/screens/SplashScreen.dart';
+import 'src/ui/screens/SplashScreen.dart';
 
 bool isLoggedIn = false;
 bool isInit = true;
