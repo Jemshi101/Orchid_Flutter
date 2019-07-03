@@ -35,7 +35,7 @@ packages:
       name: boolean_selector
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.0.4"
+    version: "1.0.5"
   build:
     dependency: transitive
     description:
@@ -112,7 +112,7 @@ packages:
       name: chopper_generator
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.4.0"
+    version: "2.4.1"
   code_builder:
     dependency: transitive
     description:
@@ -155,6 +155,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.2.4"
+  equatable:
+    dependency: "direct main"
+    description:
+      name: equatable
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.1.10"
   firebase_auth:
     dependency: "direct main"
     description:

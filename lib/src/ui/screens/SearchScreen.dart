@@ -1,11 +1,11 @@
 import 'package:Orchid/src/constants/Colors.dart';
 import 'package:Orchid/src/models/MovieBean.dart';
-import 'package:Orchid/src/network/DataManager.dart';
-import 'package:Orchid/src/network/models/SearchResponse.dart';
 import 'package:Orchid/src/styles.dart';
 import 'package:Orchid/src/ui/BloC/SearchBloc.dart';
-import 'package:Orchid/src/ui/core/BaseState.dart';
+import 'package:Orchid/src/ui/core/BaseWidgetState.dart';
+import 'package:Orchid/src/ui/events/SearchEvent.dart';
 import 'package:Orchid/src/ui/screens/MovieDetailScreen.dart';
+import 'package:Orchid/src/ui/states/SearchState.dart';
 import 'package:Orchid/src/utils/ColorUtil.dart';
 import 'package:Orchid/src/utils/DisplayUtil.dart';
 import 'package:flutter/material.dart';
@@ -23,29 +23,25 @@ class SearchScreen extends StatefulWidget {
   _SearchScreenState createState() => _SearchScreenState();
 }
 
-class _SearchScreenState extends BaseState<SearchScreen> {
+class _SearchScreenState extends BaseWidgetState<SearchScreen> {
   final _searchController = TextEditingController();
   ScrollController _scrollController;
 
-  int _counter = 0;
-
-  bool isLoading = false;
-  bool isEmptyList = false;
-
-  String _lastSearchedQuery = "";
-  int _currentPage = 1;
-  SearchResponse _currentSearchResponse;
+  SearchBloc _bloc;
 
   @override
   void dispose() {
     // Clean up the controller when the Widget is disposed
     _searchController.removeListener(_scrollListener);
     _searchController.dispose();
+    _bloc.dispose();
     super.dispose();
   }
 
   @override
   void initState() {
+    _bloc = BlocProvider.of<SearchBloc>(context);
+
     _scrollController = ScrollController();
 //    if (currentScrollOffset > 0) _scrollController.jumpTo(currentScrollOffset);
     _scrollController.addListener(_scrollListener);
@@ -59,10 +55,11 @@ class _SearchScreenState extends BaseState<SearchScreen> {
     if (_scrollController.position.pixels >=
             _scrollController.position.maxScrollExtent &&
         !_scrollController.position.outOfRange) {
-      if (_currentSearchResponse != null &&
-          _currentSearchResponse.movieList.length <
-              num.parse(_currentSearchResponse.totalResults)) {}
-      _onSearchParamChanged(_searchController.text, false);
+      /*if (_bloc.currentSearchResponse != null &&
+          _bloc.currentSearchResponse.movieList.length <
+              num.parse(_bloc.currentSearchResponse.totalResults)) {}
+      */
+      _bloc.dispatch(SearchQueryEnteredEvent(_searchController.text, false));
       //          message = "reach the bottom";
     }
     if (_scrollController.offset <=
@@ -74,8 +71,6 @@ class _SearchScreenState extends BaseState<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final SearchBloc _bloc = BlocProvider.of<SearchBloc>(context);
-
     // This method is rerun every time setState is called, for instance as done
     // by the _incrementCounter method above.
     //
@@ -101,12 +96,14 @@ class _SearchScreenState extends BaseState<SearchScreen> {
 //              if (isLoading) LinearProgressIndicator(),
               _getSearchBoxLayout(context),
 //              _getMovieGridLayout(context),
-              BlocBuilder(
-                  bloc: _bloc,
-                  builder: (context, isLoading) {
-                    return isLoading
+              BlocBuilder<SearchEvent, SearchState>(
+                  bloc: BlocProvider.of<SearchBloc>(context),
+                  condition: (previousState, currentState) =>
+                      previousState != currentState,
+                  builder: (BuildContext context, SearchState state) {
+                    return state.isProgressVisible
                         ? _getLoadingLayout(context)
-                        : isEmptyList
+                        : state.isEmptyList
                             ? _getNoResultLayout(context)
                             : _getMovieGridLayout(context);
                   }),
@@ -148,7 +145,7 @@ class _SearchScreenState extends BaseState<SearchScreen> {
                       border: OutlineInputBorder(
                           borderRadius: BorderRadius.all(Radius.circular(5)))),
                   onChanged: (text) {
-                    _onSearchParamChanged(text, true);
+                    _bloc.dispatch(SearchQueryEnteredEvent(text, true));
                   },
                 ),
               )),
@@ -232,24 +229,30 @@ class _SearchScreenState extends BaseState<SearchScreen> {
       ),
     );*/
 
-    return Flexible(
-      flex: 1,
-      child: GridView.count(
-        crossAxisCount: (DisplayUtil.getDisplayWidth(context) ~/ 160) > 1
-            ? DisplayUtil.getDisplayWidth(context) ~/ 160
-            : 1,
-        padding: EdgeInsets.all(16.0),
-        childAspectRatio: 8.0 / 9.0,
-        children: _buildGridCards(context),
-        controller: _scrollController,
+    return BlocBuilder<SearchEvent, SearchState>(
+        bloc: BlocProvider.of<SearchBloc>(context),
+        condition: (previousState, currentState) =>
+            previousState != currentState,
+        builder: (BuildContext context, SearchState state) {
+          return Flexible(
+            flex: 1,
+            child: GridView.count(
+              crossAxisCount: (DisplayUtil.getDisplayWidth(context) ~/ 160) > 1
+                  ? DisplayUtil.getDisplayWidth(context) ~/ 160
+                  : 1,
+              padding: EdgeInsets.all(16.0),
+              childAspectRatio: 8.0 / 9.0,
+              children: _buildGridCards(context, state),
+              controller: _scrollController,
 //      children: [],
-      ),
-    );
+            ),
+          );
+        });
   }
 
-  List<Card> _buildGridCards(BuildContext context) {
-    if (_currentSearchResponse == null ||
-        _currentSearchResponse.movieList.isEmpty) {
+  List<Card> _buildGridCards(BuildContext context, SearchState searchState) {
+    if (searchState.currentSearchResponse == null ||
+        searchState.currentSearchResponse.movieList.isEmpty) {
       return const <Card>[];
     }
 
@@ -257,7 +260,7 @@ class _SearchScreenState extends BaseState<SearchScreen> {
     /*final NumberFormat formatter = NumberFormat.simpleCurrency(
         locale: Localizations.localeOf(context).toString());*/
 
-    return _currentSearchResponse.movieList.map((movieBean) {
+    return searchState.currentSearchResponse.movieList.map((movieBean) {
       return Card(
         clipBehavior: Clip.antiAlias,
         // TODO: Adjust card heights (103)
@@ -355,61 +358,5 @@ class _SearchScreenState extends BaseState<SearchScreen> {
               title: movieBean.title,
             ));
     Navigator.push(context, route);
-  }
-
-  void _onSearchParamChanged(String query, bool isLoadingRequired) {
-    if (query.length >= 3) {
-      if (isLoadingRequired) {
-        setState(() {
-          isLoading = isLoadingRequired;
-        });
-      }
-
-      if (_lastSearchedQuery.toLowerCase() == query.toLowerCase()) {
-        _currentPage += 1;
-      } else {
-        _currentPage = 1;
-        _currentSearchResponse = null;
-        _lastSearchedQuery = query;
-      }
-
-      DataManager.searchMovies(query.toLowerCase(), _currentPage).then((value) {
-        if (_currentSearchResponse == null) {
-          _currentSearchResponse = value.responseBody;
-        } else {
-          _currentSearchResponse.movieList
-              .addAll((value.responseBody as SearchResponse).movieList);
-        }
-
-        if ((_currentPage <= 4) &&
-            _currentSearchResponse.movieList.length <
-                num.parse(_currentSearchResponse.totalResults)) {
-          _onSearchParamChanged(_searchController.text, false);
-        }
-
-        setState(() {
-          if (_currentSearchResponse == null ||
-              _currentSearchResponse.movieList.isEmpty) {
-            isEmptyList = true;
-          } else {
-            isEmptyList = false;
-          }
-          isLoading = false;
-        });
-      }).catchError((error) {
-        if (_currentPage > 1) {
-          _currentPage--;
-        }
-        setState(() {
-          if (_currentSearchResponse == null ||
-              _currentSearchResponse.movieList.isEmpty) {
-            isEmptyList = true;
-          } else {
-            isEmptyList = false;
-          }
-          isLoading = false;
-        });
-      });
-    }
   }
 }

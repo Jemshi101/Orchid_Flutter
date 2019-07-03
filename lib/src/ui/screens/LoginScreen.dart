@@ -1,4 +1,4 @@
-import 'package:Orchid/src/ui/core/BaseState.dart';
+import 'package:Orchid/src/ui/core/BaseWidgetState.dart';
 import 'package:Orchid/src/ui/screens/SearchScreen.dart';
 import 'package:Orchid/src/constants/Colors.dart';
 import 'package:Orchid/src/constants/SharedPrefKeys.dart';
@@ -28,7 +28,7 @@ class LoginScreen extends StatefulWidget {
   _LoginScreenState createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends BaseState<LoginScreen> {
+class _LoginScreenState extends BaseWidgetState<LoginScreen> {
 
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();

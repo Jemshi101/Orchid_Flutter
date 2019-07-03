@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 
-abstract class BaseState<T extends StatefulWidget> extends State<T>{
+abstract class BaseWidgetState<T extends StatefulWidget> extends State<T>{
 
   var scaffoldKey = new GlobalKey<ScaffoldState>();
 
