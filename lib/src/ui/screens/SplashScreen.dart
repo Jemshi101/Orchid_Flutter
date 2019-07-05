@@ -1,16 +1,11 @@
-import 'dart:developer';
-import 'dart:io';
-import 'dart:io' show Platform;
-
 import 'package:Orchid/src/constants/Colors.dart';
 import 'package:Orchid/src/styles.dart';
-import 'package:Orchid/src/ui/BloC/SearchBloc.dart';
+import 'package:Orchid/src/ui/BloC/SplashBloc.dart';
 import 'package:Orchid/src/ui/screens/LoginScreen.dart';
 import 'package:Orchid/src/ui/screens/SearchScreen.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:provider/provider.dart';
 
 class SplashScreen extends StatefulWidget {
   SplashScreen({Key key, this.title}) : super(key: key);
@@ -31,86 +26,24 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-  final firebaseAuth = FirebaseAuth.instance;
-
   final _scaffoldKey = new GlobalKey<ScaffoldState>();
 
-  int _counter = 0;
-
-  bool isInit = true;
-  bool isLoggedIn = false;
-
-  void _setLoggedInStatus(bool isLoggedIn) {
-    SchedulerBinding.instance.addPostFrameCallback((_) => setState(() {
-          this.isLoggedIn = isLoggedIn;
-          isInit = false;
-
-          Future.delayed(const Duration(seconds: 2), () {
-            _processLogIn();
-          });
-        }));
-  }
+  SplashBloc _bloc;
 
   void initState() {
     super.initState();
     if (SchedulerBinding.instance.schedulerPhase == SchedulerPhase.idle) {
       SchedulerBinding.instance
-          .addPostFrameCallback((_) => _checkForLogIn(context));
+          .addPostFrameCallback((_) => _bloc.checkForLogIn());
     }
-  }
-
-  _checkForLogIn(BuildContext context) async {
-//    Future.delayed(const Duration(seconds: 5), () {
-    if (Platform.isAndroid || Platform.isIOS) {
-      getUser().then((user) {
-        if (user != null) {
-          _setLoggedInStatus(true);
-        } else {
-          _setLoggedInStatus(false);
-        }
-      });
-    } else {
-      Future.delayed(const Duration(seconds: 4), () {
-        _setLoggedInStatus(true);
-      });
-    }
-//    });
-
-    log("In Check For Login");
-    /*SharedPreferences prefs = await SharedPreferences.getInstance();
-    if (prefs.getKeys().contains(SharedPrefKeys.IS_LOGGED_IN)) {
-      _setLoggedInStatus(prefs.getBool(SharedPrefKeys.IS_LOGGED_IN));
-    } else {
-      _setLoggedInStatus(false);
-    }*/
-    /*int counter = (prefs.getInt('counter') ?? 0) + 1;
-    print('Pressed $counter times.');
-    await prefs.setInt('counter', counter);*/
-  }
-
-  Future<FirebaseUser> getUser() async {
-    return await firebaseAuth.currentUser();
-  }
-
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-      isInit = !isInit;
-
-      if (_counter == 5) {
-        isLoggedIn = true;
-        isInit = false;
-      }
-    });
   }
 
   @override
   Widget build(BuildContext context) {
+    _bloc = Provider.of<SplashBloc>(context);
+    _bloc.isLoggedInStream.stream.listen((isLoggedIn) {
+      _processLogIn(isLoggedIn);
+    });
     return Scaffold(
       key: _scaffoldKey,
       /*appBar: AppBar(
@@ -186,7 +119,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
   _navigateToSearchPage(BuildContext context) {
     Route route =
-    MaterialPageRoute(builder: (context) => SearchScreen("Orchid"));
+        MaterialPageRoute(builder: (context) => SearchScreen("Orchid"));
     Navigator.pushReplacement(context, route);
   }
 
@@ -195,8 +128,8 @@ class _SplashScreenState extends State<SplashScreen> {
     Navigator.pushReplacement(context, route);
   }
 
-  void _processLogIn() {
-    !isInit && isLoggedIn != null && isLoggedIn
+  void _processLogIn(isLoggedIn) {
+    !_bloc.isInit && isLoggedIn != null && isLoggedIn
         ? _navigateToSearchPage(context)
         : _navigateToLoginPage(context);
   }

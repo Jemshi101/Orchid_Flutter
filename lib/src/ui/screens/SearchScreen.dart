@@ -88,17 +88,23 @@ class _SearchScreenState extends BaseWidgetState<SearchScreen> {
             constraints: BoxConstraints.expand(),
             color: ColorConstant.CARBON,
           ),
-          Column(
-            children: <Widget>[
+          GestureDetector(
+            behavior: HitTestBehavior.deferToChild,
+            onTapDown: (TapDownDetails details){
+              FocusScope.of(context).requestFocus(new FocusNode());
+            },
+            child: Column(
+              children: <Widget>[
 //              if (isLoading) LinearProgressIndicator(),
-              _getSearchBoxLayout(context),
+                _getSearchBoxLayout(context),
 //              _getMovieGridLayout(context),
-              _bloc.isProgressVisible
-                  ? _getLoadingLayout(context)
-                  : _bloc.isEmptyList
-                      ? _getNoResultLayout(context)
-                      : _getMovieGridLayout(context),
-            ],
+                _bloc.isProgressVisible
+                    ? _getLoadingLayout(context)
+                    : _bloc.isEmptyList
+                        ? _getNoResultLayout(context)
+                        : _getMovieGridLayout(context),
+              ],
+            ),
           ),
         ],
       ), /*floatingActionButton: FloatingActionButton(
@@ -222,15 +228,21 @@ class _SearchScreenState extends BaseWidgetState<SearchScreen> {
 
     return Flexible(
       flex: 1,
-      child: GridView.count(
-        crossAxisCount: (DisplayUtil.getDisplayWidth(context) ~/ 160) > 1
-            ? DisplayUtil.getDisplayWidth(context) ~/ 160
-            : 1,
-        padding: EdgeInsets.all(16.0),
-        childAspectRatio: 8.0 / 9.0,
-        children: _buildGridCards(context),
-        controller: _scrollController,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onPanDown: (_) {
+          FocusScope.of(context).requestFocus(FocusNode());
+        },
+        child: GridView.count(
+          crossAxisCount: (DisplayUtil.getDisplayWidth(context) ~/ 160) > 1
+              ? DisplayUtil.getDisplayWidth(context) ~/ 160
+              : 1,
+          padding: EdgeInsets.all(16.0),
+          childAspectRatio: 8.0 / 9.0,
+          children: _buildGridCards(context),
+          controller: _scrollController,
 //      children: [],
+        ),
       ),
     );
   }

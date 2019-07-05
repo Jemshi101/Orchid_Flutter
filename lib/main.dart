@@ -3,8 +3,11 @@ import 'dart:io' show Platform;
 
 import 'package:Orchid/src/ui/BloC/BaseBloc.dart';
 import 'package:Orchid/src/ui/BloC/LoginBloc.dart';
+import 'package:Orchid/src/ui/BloC/MovieDetailsBloc.dart';
 import 'package:Orchid/src/ui/BloC/SearchBloc.dart';
-import 'package:flutter/foundation.dart' show debugDefaultTargetPlatformOverride;
+import 'package:Orchid/src/ui/BloC/SplashBloc.dart';
+import 'package:flutter/foundation.dart'
+    show debugDefaultTargetPlatformOverride;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -22,7 +25,6 @@ void main() {
 }
 
 void _setTargetPlatformForDesktop() {
-
   TargetPlatform targetPlatform;
   if (Platform.isMacOS) {
 //    targetPlatform = TargetPlatform.iOS;
@@ -35,7 +37,6 @@ void _setTargetPlatformForDesktop() {
     debugDefaultTargetPlatformOverride = targetPlatform;
   }
 }
-
 
 /*_checkForLogIn() async {
   getUser().then((user) {
@@ -56,8 +57,11 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider<BaseBloc>.value(value: BaseBloc()),
+        ChangeNotifierProvider<SplashBloc>.value(value: SplashBloc()),
         ChangeNotifierProvider<LoginBloc>.value(value: LoginBloc()),
         ChangeNotifierProvider<SearchBloc>.value(value: SearchBloc()),
+        ChangeNotifierProvider<MovieDetailsBloc>.value(
+            value: MovieDetailsBloc()),
       ],
       child: MaterialApp(
         title: 'Orchid',
@@ -78,4 +82,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
