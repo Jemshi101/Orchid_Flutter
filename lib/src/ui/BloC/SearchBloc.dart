@@ -1,106 +1,92 @@
-import 'dart:async';
-
 import 'package:Orchid/src/network/DataManager.dart';
 import 'package:Orchid/src/network/models/SearchResponse.dart';
-import 'package:Orchid/src/ui/events/SearchEvent.dart';
-import 'package:Orchid/src/ui/states/SearchState.dart';
-import 'package:bloc/bloc.dart';
+import 'package:Orchid/src/ui/BloC/BaseBloc.dart';
 
-class SearchBloc extends Bloc<SearchEvent, SearchState> {
-  @override
-  get initialState => new SearchState.initial();
+class SearchBloc extends BaseBloc {
+  SearchResponse currentSearchResponse;
 
-  @override
-  void dispose() {
-    super.dispose();
-  }
+  String _lastSearchedQuery = "";
+  int currentPage = 1;
+  bool isEmptyList = false;
+  bool isSearching = false;
 
-  @override
-  Stream<SearchState> mapEventToState(event) async* {
-    if (event is SearchQueryEnteredEvent) {
-      if (currentState.currentSearchResponse != null &&
-          currentState.currentSearchResponse.movieList.length <
-              num.parse(currentState.currentSearchResponse.totalResults)) {}
+  void onSearchQueryEntered(String query, bool isLoadingRequired) {
+    if (currentSearchResponse != null &&
+        currentSearchResponse.movieList.length <
+            num.parse(currentSearchResponse.totalResults)) {}
 
-      if (event.query.length >= 3) {
-        if (event.isLoadingRequired) {
-          currentState.isProgressVisible = true;
-        }
-        _onSearchParamChanged(event.query, event.isLoadingRequired);
-        yield currentState;
+    if (query.length >= 3) {
+      if (isLoadingRequired) {
+        isProgressVisible = true;
+        notifyListeners();
       }
-    } else if (event is SearchCompletedEvent) {
-      currentState.isSearching = false;
-      if (event.isError) { /*On Error Reducing the CurrentPage Count*/
-        currentState..isSearching = false;
-        if (currentState.currentPage > 1) {
-          currentState.currentPage--;
-        }
-      } else { /* OnSuccess Adding the Result into CurrentMovie Array*/
-        if (currentState.currentSearchResponse == null) {
-          currentState.currentSearchResponse = event.currentSearchResponse;
-        } else {
-          currentState.currentSearchResponse.movieList.addAll(
-              event.currentSearchResponse.movieList);
-        }
-      }
-
-      /*Setting Search UI States Based On Result*/
-      if (currentState.currentSearchResponse == null ||
-          currentState.currentSearchResponse.movieList.isEmpty) {
-        currentState.isEmptyList = true;
-      } else {
-        currentState.isEmptyList = false;
-      }
-      currentState.isProgressVisible = false;
-
-      yield currentState;
+      _onSearchParamChanged(query, isLoadingRequired);
     }
-//    super.mapEventToState(event);
-    yield currentState;
   }
 
   void _onSearchParamChanged(String query, bool isLoadingRequired) {
     if (query.length >= 3) {
       /*if (isLoadingRequired) {
-        currentState.isProgressVisible = true;
+        isProgressVisible = true;
         return new Future<BaseState>.value(currentState);
       }*/
 
-      if (currentState.lastSearchedQuery.toLowerCase() == query.toLowerCase()) {
-        currentState.currentPage += 1;
+      if (_lastSearchedQuery.toLowerCase() == query.toLowerCase()) {
+        currentPage += 1;
       } else {
-        currentState.currentPage = 1;
-        currentState.currentSearchResponse = null;
-        currentState.lastSearchedQuery = query;
+        currentPage = 1;
+        currentSearchResponse = null;
+        _lastSearchedQuery = query;
       }
 
-      DataManager.searchMovies(query.toLowerCase(), currentState.currentPage)
+      DataManager.searchMovies(query.toLowerCase(), currentPage)
           .then((value) async {
-
         var searchResponse = value.responseBody as SearchResponse;
 
-        if ((currentState.currentPage <= 4) &&
-            (currentState.currentSearchResponse == null
+        if ((currentPage <= 4) &&
+            (currentSearchResponse == null
                         ? 0
-                        : currentState.currentSearchResponse.movieList.length) +
+                        : currentSearchResponse.movieList.length) +
                     searchResponse.movieList.length <
                 num.parse(searchResponse.totalResults)) {
-          _onSearchParamChanged(currentState.lastSearchedQuery, false);
+          _onSearchParamChanged(_lastSearchedQuery, false);
         }
 
-        dispatch(SearchCompletedEvent(
-            currentState.lastSearchedQuery,
-            currentState.currentPage,
-            searchResponse,
-            false));
+        onSearchCompleted(
+            _lastSearchedQuery, currentPage, searchResponse, false);
       }).catchError((error) {
-        dispatch(SearchCompletedEvent(
-            currentState.lastSearchedQuery,
-            currentState.currentPage,
-            currentState.currentSearchResponse,
-            true));
+        onSearchCompleted(
+            _lastSearchedQuery, currentPage, currentSearchResponse, true);
       });
     }
+  }
+
+  void onSearchCompleted(String lastSearchedQuery, int currentPage,
+      SearchResponse searchResponse, bool isError) {
+    isSearching = false;
+    if (isError) {
+      /*On Error Reducing the CurrentPage Count*/
+      isSearching = false;
+      if (currentPage > 1) {
+        currentPage--;
+      }
+    } else {
+      /* OnSuccess Adding the Result into CurrentMovie Array*/
+      if (currentSearchResponse == null) {
+        currentSearchResponse = searchResponse;
+      } else {
+        currentSearchResponse.movieList.addAll(searchResponse.movieList);
+      }
+    }
+
+    /*Setting Search UI States Based On Result*/
+    if (currentSearchResponse == null ||
+        currentSearchResponse.movieList.isEmpty) {
+      isEmptyList = true;
+    } else {
+      isEmptyList = false;
+    }
+    isProgressVisible = false;
+    notifyListeners();
   }
 }

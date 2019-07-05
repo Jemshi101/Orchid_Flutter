@@ -186,12 +186,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
   _navigateToSearchPage(BuildContext context) {
     Route route =
-//    MaterialPageRoute(builder: (context) => SearchScreen("Orchid"));
-        MaterialPageRoute(
-            builder: (context) => BlocProvider<SearchBloc>(
-                  builder: (context) => SearchBloc(),
-                  child: SearchScreen("Orchid"),
-                ));
+    MaterialPageRoute(builder: (context) => SearchScreen("Orchid"));
     Navigator.pushReplacement(context, route);
   }
 

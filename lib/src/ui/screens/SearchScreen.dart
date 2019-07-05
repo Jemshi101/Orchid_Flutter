@@ -3,13 +3,11 @@ import 'package:Orchid/src/models/MovieBean.dart';
 import 'package:Orchid/src/styles.dart';
 import 'package:Orchid/src/ui/BloC/SearchBloc.dart';
 import 'package:Orchid/src/ui/core/BaseWidgetState.dart';
-import 'package:Orchid/src/ui/events/SearchEvent.dart';
 import 'package:Orchid/src/ui/screens/MovieDetailScreen.dart';
-import 'package:Orchid/src/ui/states/SearchState.dart';
 import 'package:Orchid/src/utils/ColorUtil.dart';
 import 'package:Orchid/src/utils/DisplayUtil.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:provider/provider.dart';
 
 String _title = "";
 double currentScrollOffset = -1;
@@ -34,14 +32,12 @@ class _SearchScreenState extends BaseWidgetState<SearchScreen> {
     // Clean up the controller when the Widget is disposed
     _searchController.removeListener(_scrollListener);
     _searchController.dispose();
-    _bloc.dispose();
+//    _bloc.dispose();
     super.dispose();
   }
 
   @override
   void initState() {
-    _bloc = BlocProvider.of<SearchBloc>(context);
-
     _scrollController = ScrollController();
 //    if (currentScrollOffset > 0) _scrollController.jumpTo(currentScrollOffset);
     _scrollController.addListener(_scrollListener);
@@ -59,7 +55,7 @@ class _SearchScreenState extends BaseWidgetState<SearchScreen> {
           _bloc.currentSearchResponse.movieList.length <
               num.parse(_bloc.currentSearchResponse.totalResults)) {}
       */
-      _bloc.dispatch(SearchQueryEnteredEvent(_searchController.text, false));
+      _bloc.onSearchQueryEntered(_searchController.text, false);
       //          message = "reach the bottom";
     }
     if (_scrollController.offset <=
@@ -71,6 +67,7 @@ class _SearchScreenState extends BaseWidgetState<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
+    _bloc = Provider.of<SearchBloc>(context);
     // This method is rerun every time setState is called, for instance as done
     // by the _incrementCounter method above.
     //
@@ -96,17 +93,11 @@ class _SearchScreenState extends BaseWidgetState<SearchScreen> {
 //              if (isLoading) LinearProgressIndicator(),
               _getSearchBoxLayout(context),
 //              _getMovieGridLayout(context),
-              BlocBuilder<SearchEvent, SearchState>(
-                  bloc: BlocProvider.of<SearchBloc>(context),
-                  condition: (previousState, currentState) =>
-                      previousState != currentState,
-                  builder: (BuildContext context, SearchState state) {
-                    return state.isProgressVisible
-                        ? _getLoadingLayout(context)
-                        : state.isEmptyList
-                            ? _getNoResultLayout(context)
-                            : _getMovieGridLayout(context);
-                  }),
+              _bloc.isProgressVisible
+                  ? _getLoadingLayout(context)
+                  : _bloc.isEmptyList
+                      ? _getNoResultLayout(context)
+                      : _getMovieGridLayout(context),
             ],
           ),
         ],
@@ -145,7 +136,7 @@ class _SearchScreenState extends BaseWidgetState<SearchScreen> {
                       border: OutlineInputBorder(
                           borderRadius: BorderRadius.all(Radius.circular(5)))),
                   onChanged: (text) {
-                    _bloc.dispatch(SearchQueryEnteredEvent(text, true));
+                    _bloc.onSearchQueryEntered(text, true);
                   },
                 ),
               )),
@@ -229,30 +220,24 @@ class _SearchScreenState extends BaseWidgetState<SearchScreen> {
       ),
     );*/
 
-    return BlocBuilder<SearchEvent, SearchState>(
-        bloc: BlocProvider.of<SearchBloc>(context),
-        condition: (previousState, currentState) =>
-            previousState != currentState,
-        builder: (BuildContext context, SearchState state) {
-          return Flexible(
-            flex: 1,
-            child: GridView.count(
-              crossAxisCount: (DisplayUtil.getDisplayWidth(context) ~/ 160) > 1
-                  ? DisplayUtil.getDisplayWidth(context) ~/ 160
-                  : 1,
-              padding: EdgeInsets.all(16.0),
-              childAspectRatio: 8.0 / 9.0,
-              children: _buildGridCards(context, state),
-              controller: _scrollController,
+    return Flexible(
+      flex: 1,
+      child: GridView.count(
+        crossAxisCount: (DisplayUtil.getDisplayWidth(context) ~/ 160) > 1
+            ? DisplayUtil.getDisplayWidth(context) ~/ 160
+            : 1,
+        padding: EdgeInsets.all(16.0),
+        childAspectRatio: 8.0 / 9.0,
+        children: _buildGridCards(context),
+        controller: _scrollController,
 //      children: [],
-            ),
-          );
-        });
+      ),
+    );
   }
 
-  List<Card> _buildGridCards(BuildContext context, SearchState searchState) {
-    if (searchState.currentSearchResponse == null ||
-        searchState.currentSearchResponse.movieList.isEmpty) {
+  List<Card> _buildGridCards(BuildContext context) {
+    if (_bloc.currentSearchResponse == null ||
+        _bloc.currentSearchResponse.movieList.isEmpty) {
       return const <Card>[];
     }
 
@@ -260,7 +245,7 @@ class _SearchScreenState extends BaseWidgetState<SearchScreen> {
     /*final NumberFormat formatter = NumberFormat.simpleCurrency(
         locale: Localizations.localeOf(context).toString());*/
 
-    return searchState.currentSearchResponse.movieList.map((movieBean) {
+    return _bloc.currentSearchResponse.movieList.map((movieBean) {
       return Card(
         clipBehavior: Clip.antiAlias,
         // TODO: Adjust card heights (103)
