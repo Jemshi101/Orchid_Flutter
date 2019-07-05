@@ -25,6 +25,7 @@ class SplashScreen extends StatefulWidget {
   _SplashScreenState createState() => _SplashScreenState();
 }
 
+
 class _SplashScreenState extends State<SplashScreen> {
   final _scaffoldKey = new GlobalKey<ScaffoldState>();
 

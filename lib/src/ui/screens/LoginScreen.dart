@@ -1,14 +1,12 @@
+import 'package:Orchid/src/constants/Colors.dart';
+import 'package:Orchid/src/styles.dart';
+import 'package:Orchid/src/ui/BloC/LoginBloc.dart';
 import 'package:Orchid/src/ui/core/BaseWidgetState.dart';
 import 'package:Orchid/src/ui/screens/SearchScreen.dart';
-import 'package:Orchid/src/constants/Colors.dart';
-import 'package:Orchid/src/constants/SharedPrefKeys.dart';
 import 'package:Orchid/src/utils/ColorUtil.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
-import 'package:Orchid/src/styles.dart';
+import 'package:provider/provider.dart';
 
 class LoginScreen extends StatefulWidget {
   LoginScreen({Key key, this.title}) : super(key: key);
@@ -29,19 +27,13 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends BaseWidgetState<LoginScreen> {
-
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
   final FocusNode _emailFocus = FocusNode();
   final FocusNode _passwordFocus = FocusNode();
 
-  final firebaseAuth = FirebaseAuth.instance;
-
-  int _counter = 0;
-
-  bool isLoggedIn = false;
-  bool isLoading = false;
+  LoginBloc _bloc;
 
   @override
   void dispose() {
@@ -50,33 +42,14 @@ class _LoginScreenState extends BaseWidgetState<LoginScreen> {
     super.dispose();
   }
 
-  void _setLoggedInStatus(bool isLoggedIn) {
-    setState(() {
-      this.isLoggedIn = isLoggedIn;
-    });
-  }
-
-  Future<FirebaseUser> getUser() async {
-    return await firebaseAuth.currentUser();
-  }
-
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-
-      if (_counter == 5) {
-        isLoggedIn = true;
-      }
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
+    _bloc = Provider.of<LoginBloc>(context);
+    _bloc.snackBarStream.stream.listen((snackBarBean) {
+      showSnackBar(
+          snackBarBean.message, snackBarBean.time, snackBarBean.action);
+    });
+
     return Scaffold(
       key: scaffoldKey,
       /*appBar: AppBar(
@@ -100,8 +73,8 @@ class _LoginScreenState extends BaseWidgetState<LoginScreen> {
                 child: Image.asset('assets/images/logo.png',
                     alignment: AlignmentDirectional.topCenter),
               ),
-              !isLoggedIn
-                  ? isLoading
+              !_bloc.isLoggedIn
+                  ? _bloc.isProgressVisible
                       ? _getLoadingLayout(context)
                       : _getLoginLayout(context)
                   : _navigateToSearchPage(),
@@ -243,83 +216,9 @@ class _LoginScreenState extends BaseWidgetState<LoginScreen> {
   }
 
   _onLoginPressed() {
-    setLoading(true);
     String email = _emailController.text;
     String password = _passwordController.text;
 
-    if (validate(email, password)) {
-      _performLogin(email, password);
-    } else {
-      setLoading(false);
-    }
+    _bloc.processLogin(email, password);
   }
-
-  bool validate(String email, String password) {
-    if (email.isEmpty) {
-      showSnackBar(
-          "Please Enter the Email Address", Duration(seconds: 5), null);
-      return false;
-    }
-    if (password.isEmpty || password.length < 8) {
-      showSnackBar("Please Enter the Password", Duration(seconds: 5), null);
-      return false;
-    }
-    return true;
-  }
-
-  _performLogin(String email, String password) async {
-    await firebaseAuth
-        .signInWithEmailAndPassword(email: email, password: password)
-        .then((user) {
-      if (user != null) {
-        setLoading(false);
-        _saveUser(user);
-        _navigateToSearchPage();
-      }
-    }).catchError((e) {
-      setLoading(false);
-      print(e);
-      if (e.code == "ERROR_USER_NOT_FOUND") {
-        _performSignUp(email, password);
-      } else {
-        showSnackBar(e.details, Duration(seconds: 10), null);
-      }
-    });
-  }
-
-  void setLoading(bool isLoadingVisible) {
-    setState(() {
-      isLoading = isLoadingVisible;
-    });
-  }
-
-  void _saveUser(FirebaseUser user) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString(SharedPrefKeys.USER_ID, user.uid);
-    await prefs.setBool(SharedPrefKeys.IS_LOGGED_IN, true);
-  }
-
-  _performSignUp(String email, String password) async {
-    setLoading(true);
-
-    await firebaseAuth
-        .createUserWithEmailAndPassword(
-      email: email,
-      password: password,
-    )
-        .then((user) {
-      if (user != null) {
-        setLoading(false);
-        _saveUser(user);
-        _navigateToSearchPage();
-      } else {
-        showSnackBar("User registration failed. Please try again later!!!!",
-            Duration(seconds: 5), null);
-      }
-    }).catchError((e) {
-      showSnackBar(e.details, Duration(seconds: 10), null);
-    });
-  }
-
-  
 }
