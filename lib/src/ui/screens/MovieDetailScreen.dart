@@ -3,40 +3,39 @@ import 'package:Orchid/src/constants/Colors.dart';
 import 'package:Orchid/src/models/MovieBean.dart';
 import 'package:Orchid/src/network/DataManager.dart';
 import 'package:Orchid/src/network/models/MovieDetailResponse.dart';
+import 'package:Orchid/src/ui/BloC/MovieDetailsBloc.dart';
 import 'package:Orchid/src/utils/ColorUtil.dart';
 import 'package:flutter/material.dart';
 //import 'package:flutter_web/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:Orchid/src/styles.dart';
+import 'package:provider/provider.dart';
 
 class MovieDetailScreen extends StatefulWidget {
-  MovieDetailScreen(this.movieBean, {Key key, this.title}) : super(key: key);
-
   final String title;
   final MovieBean movieBean;
+  MovieDetailScreen(this.movieBean, {Key key, this.title}) : super(key: key);
 
   @override
   _MovieDetailScreenState createState() => _MovieDetailScreenState();
 }
 
 class _MovieDetailScreenState extends State<MovieDetailScreen> {
-  int _counter = 0;
+  MovieDetailsBloc _bloc;
 
-  bool isLoading = true;
-
-  MovieDetailResponse movieDetailResponse;
 
   @override
   void initState() {
 //    if (SchedulerBinding.instance.schedulerPhase == SchedulerPhase.idle) {
     SchedulerBinding.instance
-        .addPostFrameCallback((_) => _fetchMovieDetails(widget.movieBean));
+        .addPostFrameCallback((_) => _bloc.fetchMovieDetails(widget.movieBean));
 //    }
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    _bloc = Provider.of<MovieDetailsBloc>(context);
     // This method is rerun every time setState is called, for instance as done
     // by the _incrementCounter method above.
     //
@@ -51,14 +50,14 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
       body: Container(
         constraints: BoxConstraints.expand(),
         color: ColorConstant.CARBON,
-        child: isLoading
+        child: _bloc.isProgressVisible
             ? _getLoadingLayout(context)
             : ListView(
                 padding: const EdgeInsets.all(16.0),
                 scrollDirection: Axis.vertical,
                 children: <Widget>[
                   _getHeaderLayout(),
-                  movieDetailResponse == null
+                  _bloc.movieDetailResponse == null
                       ? _getErrorLayout(context)
                       : _getMovieDetailsLayout(context),
                 ],
@@ -75,7 +74,7 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
   Widget _getHeaderLayout() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(0, 0, 0, 20),
-      child: movieDetailResponse == null
+      child: _bloc.movieDetailResponse == null
           ? _getErrorHeaderLayout(context)
           : _getHeaderDetailLayout(),
     );
@@ -101,14 +100,14 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
             padding: EdgeInsets.fromLTRB(0, 0, 16, 0),
             child: FadeInImage.assetNetwork(
                 placeholder: "assets/images/logo.png",
-                image: movieDetailResponse != null
-                    ? movieDetailResponse.poster
+                image: _bloc.movieDetailResponse != null
+                    ? _bloc.movieDetailResponse.poster
                     : widget.movieBean.poster,
                 fit: BoxFit.contain,
                 alignment: AlignmentDirectional.topStart),
             /*child: Image.network(
-                movieDetailResponse != null
-                    ? movieDetailResponse.poster
+                _bloc.movieDetailResponse != null
+                    ? _bloc.movieDetailResponse.poster
                     : widget.movieBean.poster,
                 fit: BoxFit.contain,
                 alignment: AlignmentDirectional.topStart),*/
@@ -147,7 +146,7 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
           textAlign: TextAlign.start,
         ),
         Text(
-          '${movieDetailResponse != null ? movieDetailResponse.year : widget.movieBean.year}',
+          '${_bloc.movieDetailResponse != null ? _bloc.movieDetailResponse.year : widget.movieBean.year}',
           style: Styles.getWhiteTextTheme(Theme.of(context).textTheme.title),
           textAlign: TextAlign.start,
           textScaleFactor: .8,
@@ -170,7 +169,7 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
             textAlign: TextAlign.start,
           ),
           Text(
-            '${movieDetailResponse.genre}',
+            '${_bloc.movieDetailResponse.genre}',
             style: Styles.getWhiteTextTheme(Theme.of(context).textTheme.title),
             textAlign: TextAlign.start,
             textScaleFactor: .8,
@@ -194,7 +193,7 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
             textAlign: TextAlign.start,
           ),
           Text(
-            '${movieDetailResponse.language}',
+            '${_bloc.movieDetailResponse.language}',
             style: Styles.getWhiteTextTheme(Theme.of(context).textTheme.title),
             textAlign: TextAlign.start,
             textScaleFactor: .8,
@@ -218,7 +217,7 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
             textAlign: TextAlign.start,
           ),
           Text(
-            '${movieDetailResponse.imdbRating}',
+            '${_bloc.movieDetailResponse.imdbRating}',
             style: Styles.getWhiteTextTheme(Theme.of(context).textTheme.title),
             textAlign: TextAlign.start,
             textScaleFactor: .8,
@@ -242,7 +241,7 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
             textAlign: TextAlign.start,
           ),
           Text(
-            '${movieDetailResponse.imdbVotes}',
+            '${_bloc.movieDetailResponse.imdbVotes}',
             style: Styles.getWhiteTextTheme(Theme.of(context).textTheme.title),
             textAlign: TextAlign.start,
             textScaleFactor: .8,
@@ -282,7 +281,7 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
           textAlign: TextAlign.start,
         ),
         Text(
-          '${movieDetailResponse != null ? movieDetailResponse.title : widget.movieBean.title}',
+          '${_bloc.movieDetailResponse != null ? _bloc.movieDetailResponse.title : widget.movieBean.title}',
           style: Styles.getWhiteTextTheme(Theme.of(context).textTheme.title),
           textAlign: TextAlign.start,
         ),
@@ -303,7 +302,7 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
             textAlign: TextAlign.start,
           ),
           Text(
-            '${movieDetailResponse.plot}',
+            '${_bloc.movieDetailResponse.plot}',
             style: Styles.getWhiteTextTheme(Theme.of(context).textTheme.title),
             textAlign: TextAlign.start,
             textScaleFactor: .8,
@@ -326,7 +325,7 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
             textAlign: TextAlign.start,
           ),
           Text(
-            '${movieDetailResponse.director}',
+            '${_bloc.movieDetailResponse.director}',
             style: Styles.getWhiteTextTheme(Theme.of(context).textTheme.title),
             textAlign: TextAlign.start,
             textScaleFactor: .8,
@@ -349,7 +348,7 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
             textAlign: TextAlign.start,
           ),
           Text(
-            '${movieDetailResponse.actors}',
+            '${_bloc.movieDetailResponse.actors}',
             style: Styles.getWhiteTextTheme(Theme.of(context).textTheme.title),
             textAlign: TextAlign.start,
             textScaleFactor: .8,
@@ -372,7 +371,7 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
             textAlign: TextAlign.start,
           ),
           Text(
-            '${movieDetailResponse.writer}',
+            '${_bloc.movieDetailResponse.writer}',
             style: Styles.getWhiteTextTheme(Theme.of(context).textTheme.title),
             textAlign: TextAlign.start,
             textScaleFactor: .8,
@@ -395,7 +394,7 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
             textAlign: TextAlign.start,
           ),
           Text(
-            '${movieDetailResponse.website}',
+            '${_bloc.movieDetailResponse.website}',
             style: Styles.getWhiteTextTheme(Theme.of(context).textTheme.title),
             textAlign: TextAlign.start,
             textScaleFactor: .8,
@@ -418,7 +417,7 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
             textAlign: TextAlign.start,
           ),
           Text(
-            '${movieDetailResponse.awards}',
+            '${_bloc.movieDetailResponse.awards}',
             style: Styles.getWhiteTextTheme(Theme.of(context).textTheme.title),
             textAlign: TextAlign.start,
             textScaleFactor: .8,
@@ -441,7 +440,7 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
             textAlign: TextAlign.start,
           ),
           Text(
-            '${movieDetailResponse.runtime}',
+            '${_bloc.movieDetailResponse.runtime}',
             style: Styles.getWhiteTextTheme(Theme.of(context).textTheme.title),
             textAlign: TextAlign.start,
             textScaleFactor: .8,
@@ -464,7 +463,7 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
             textAlign: TextAlign.start,
           ),
           Text(
-            '${movieDetailResponse.released}',
+            '${_bloc.movieDetailResponse.released}',
             style: Styles.getWhiteTextTheme(Theme.of(context).textTheme.title),
             textAlign: TextAlign.start,
             textScaleFactor: .8,
@@ -487,7 +486,7 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
             textAlign: TextAlign.start,
           ),
           Text(
-            '${movieDetailResponse.boxOffice}',
+            '${_bloc.movieDetailResponse.boxOffice}',
             style: Styles.getWhiteTextTheme(Theme.of(context).textTheme.title),
             textAlign: TextAlign.start,
             textScaleFactor: .8,
@@ -510,7 +509,7 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
             textAlign: TextAlign.start,
           ),
           Text(
-            '${movieDetailResponse.production}',
+            '${_bloc.movieDetailResponse.production}',
             style: Styles.getWhiteTextTheme(Theme.of(context).textTheme.title),
             textAlign: TextAlign.start,
             textScaleFactor: .8,
@@ -533,7 +532,7 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
             textAlign: TextAlign.start,
           ),
           Text(
-            '${movieDetailResponse.rated}',
+            '${_bloc.movieDetailResponse.rated}',
             style: Styles.getWhiteTextTheme(Theme.of(context).textTheme.title),
             textAlign: TextAlign.start,
             textScaleFactor: .8,
@@ -556,7 +555,7 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
             textAlign: TextAlign.start,
           ),
           Text(
-            '${movieDetailResponse.country}',
+            '${_bloc.movieDetailResponse.country}',
             style: Styles.getWhiteTextTheme(Theme.of(context).textTheme.title),
             textAlign: TextAlign.start,
             textScaleFactor: .8,
@@ -617,22 +616,5 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
     );
   }
 
-  _fetchMovieDetails(MovieBean movieBean) async {
-    _setLoading(true);
 
-    DataManager.getMovieDetails(movieBean.imdbID, AppConstants.PLOT_TYPE_FULL)
-        .then((value) {
-      movieDetailResponse = value.responseBody;
-
-      _setLoading(false);
-    }).catchError((error) {
-      _setLoading(false);
-    });
-  }
-
-  void _setLoading(isLoadingRequired) {
-    setState(() {
-      isLoading = isLoadingRequired;
-    });
-  }
 }
