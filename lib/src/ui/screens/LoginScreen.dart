@@ -1,9 +1,10 @@
 import 'package:Orchid/src/constants/Colors.dart';
+import 'package:Orchid/src/decorations.dart';
 import 'package:Orchid/src/styles.dart';
 import 'package:Orchid/src/ui/BloC/LoginBloc.dart';
 import 'package:Orchid/src/ui/core/BaseWidgetState.dart';
 import 'package:Orchid/src/ui/screens/SearchScreen.dart';
-import 'package:Orchid/src/utils/ColorUtil.dart';
+import 'package:Orchid/src/ui/widgets/LoadingWidget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -75,7 +76,8 @@ class _LoginScreenState extends BaseWidgetState<LoginScreen> {
               ),
               !_bloc.isLoggedIn
                   ? _bloc.isProgressVisible
-                      ? _getLoadingLayout(context)
+                      ? LoadingWidget()
+//                      _getLoadingLayout(context)
                       : _getLoginLayout(context)
                   : _navigateToSearchPage(),
             ],
@@ -90,122 +92,101 @@ class _LoginScreenState extends BaseWidgetState<LoginScreen> {
     );
   }
 
-  Widget _getLoadingLayout(BuildContext context) {
-    return Padding(
-        padding: EdgeInsets.all(20),
-        child: Flex(
-            direction: Axis.vertical,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              CircularProgressIndicator(
-                backgroundColor: ColorConstant.BLACK,
-                valueColor: new AlwaysStoppedAnimation(ColorUtil('#ffffffff')),
-              ),
-              Padding(
-                padding: EdgeInsets.all(50),
-                child: Text(
-                  'Please Wait...',
-                  style: Styles.getWhiteTextTheme(
-                      Theme.of(context).textTheme.display1),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-            ]));
-  }
-
-  Flex _getLoginLayout(BuildContext context) {
+  Widget _getLoginLayout(BuildContext context) {
     return Flex(
       direction: Axis.vertical,
       children: <Widget>[
-        Padding(
-          padding: EdgeInsets.fromLTRB(20, 5, 20, 5),
-          child: Theme(
-            data: Styles.getInputBoxTheme(),
-            child: TextField(
-              textInputAction: TextInputAction.next,
-              maxLines: 1,
-              keyboardType: TextInputType.emailAddress,
-              autofocus: false,
-              focusNode: _emailFocus,
-              controller: _emailController,
-              onSubmitted: (text) {
-                fieldFocusChange(context, _emailFocus, _passwordFocus);
-              },
-              style:
-                  Styles.getWhiteTextTheme(Theme.of(context).textTheme.title),
-              decoration: InputDecoration(
-                  labelStyle:
-                      TextStyle(color: ColorUtil.getColorFromHex("#ffffffff")),
-                  filled: true,
-                  labelText: 'Email Address',
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(5)))),
-            ),
-          ),
-        ),
-        Padding(
-          padding: EdgeInsets.fromLTRB(20, 5, 20, 5),
-          child: Theme(
-            data: Styles.getInputBoxTheme(),
-            child: TextField(
-              textInputAction: TextInputAction.done,
-              maxLines: 1,
-              autofocus: false,
-              focusNode: _passwordFocus,
-              controller: _passwordController,
-              onSubmitted: (text) {
-                _passwordFocus.unfocus();
-              },
-              style:
-                  Styles.getWhiteTextTheme(Theme.of(context).textTheme.title),
-              decoration: InputDecoration(
-                  labelStyle:
-                      TextStyle(color: ColorUtil.getColorFromHex("#ffffffff")),
-                  filled: true,
-                  labelText: 'Password',
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(5)))),
-              obscureText: true,
-            ),
-          ),
-        ),
-        Padding(
-          padding: EdgeInsets.fromLTRB(20, 20, 20, 50),
-          child: Material(
-//            shape: RoundedRectangleBorder(
-//                borderRadius: BorderRadius.horizontal(
-//                    left: Radius.circular(30), right: Radius.circular(30))),
-            color: Colors.purpleAccent,
-            elevation: 5,
-            borderRadius: BorderRadius.horizontal(
-                left: Radius.circular(30), right: Radius.circular(30)),
-            child: InkWell(
-                radius: 30,
-                key: Key("login"),
-                borderRadius: BorderRadius.horizontal(
-                    left: Radius.circular(30), right: Radius.circular(30)),
-                highlightColor: Colors.amberAccent,
-                splashColor: Colors.amber,
-                enableFeedback: true,
-                onTap: () {
-                  _onLoginPressed();
-                },
-                child: Container(
-                  padding: EdgeInsets.fromLTRB(35, 10, 35, 10),
-                  child: Text(
-                    "Login",
-                    style: Styles.getWhiteTextTheme(
-                        Theme.of(context).textTheme.title),
-                  ),
-                )),
-          ),
-        ),
+        _getEmailTextField(context),
+        _getPasswordTextField(context),
+        _getSubmitButton(context),
 
         /*Text(
           '$_counter',
           style: Theme.of(context).textTheme.display3,
         ),*/
       ],
+    );
+  }
+
+  Widget _getEmailTextField(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(20, 5, 20, 5),
+      child: Theme(
+        data: Styles.getInputBoxTheme(),
+        child: TextField(
+          textInputAction: TextInputAction.next,
+          maxLines: 1,
+          keyboardType: TextInputType.emailAddress,
+          autofocus: false,
+          focusNode: _emailFocus,
+          controller: _emailController,
+          onSubmitted: (text) {
+            fieldFocusChange(context, _emailFocus, _passwordFocus);
+          },
+          style: Styles.getColoredTextTheme(
+              Theme.of(context).textTheme.title, ColorConstant.WHITE),
+          decoration: Decorations.getOutlineBoxFilled(
+              ColorConstant.WHITE, "Email Address"),
+        ),
+      ),
+    );
+  }
+
+  Widget _getPasswordTextField(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(20, 5, 20, 5),
+      child: Theme(
+        data: Styles.getInputBoxTheme(),
+        child: TextField(
+          textInputAction: TextInputAction.done,
+          maxLines: 1,
+          autofocus: false,
+          focusNode: _passwordFocus,
+          controller: _passwordController,
+          onSubmitted: (text) {
+            _passwordFocus.unfocus();
+          },
+          style: Styles.getColoredTextTheme(
+              Theme.of(context).textTheme.title, ColorConstant.WHITE),
+          decoration:
+              Decorations.getOutlineBoxFilled(ColorConstant.WHITE, "Password"),
+          obscureText: true,
+        ),
+      ),
+    );
+  }
+
+  Widget _getSubmitButton(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(20, 20, 20, 50),
+      child: Material(
+//            shape: RoundedRectangleBorder(
+//                borderRadius: BorderRadius.horizontal(
+//                    left: Radius.circular(30), right: Radius.circular(30))),
+        color: Colors.purpleAccent,
+        elevation: 5,
+        borderRadius: BorderRadius.horizontal(
+            left: Radius.circular(30), right: Radius.circular(30)),
+        child: InkWell(
+            radius: 30,
+            key: Key("login"),
+            borderRadius: BorderRadius.horizontal(
+                left: Radius.circular(30), right: Radius.circular(30)),
+            highlightColor: Colors.amberAccent,
+            splashColor: Colors.amber,
+            enableFeedback: true,
+            onTap: () {
+              _onLoginPressed();
+            },
+            child: Container(
+              padding: EdgeInsets.fromLTRB(35, 10, 35, 10),
+              child: Text(
+                "Login",
+                style:
+                    Styles.getWhiteTextTheme(Theme.of(context).textTheme.title),
+              ),
+            )),
+      ),
     );
   }
 

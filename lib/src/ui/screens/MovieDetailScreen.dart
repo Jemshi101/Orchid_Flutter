@@ -4,6 +4,7 @@ import 'package:Orchid/src/models/MovieBean.dart';
 import 'package:Orchid/src/network/DataManager.dart';
 import 'package:Orchid/src/network/models/MovieDetailResponse.dart';
 import 'package:Orchid/src/ui/BloC/MovieDetailsBloc.dart';
+import 'package:Orchid/src/ui/widgets/LoadingWidget.dart';
 import 'package:Orchid/src/utils/ColorUtil.dart';
 import 'package:flutter/material.dart';
 //import 'package:flutter_web/material.dart';
@@ -51,7 +52,8 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
         constraints: BoxConstraints.expand(),
         color: ColorConstant.CARBON,
         child: _bloc.isProgressVisible
-            ? _getLoadingLayout(context)
+//            ? _getLoadingLayout(context)
+            ? LoadingWidget()
             : ListView(
                 padding: const EdgeInsets.all(16.0),
                 scrollDirection: Axis.vertical,
@@ -563,29 +565,6 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
         ],
       ),
     );
-  }
-
-  Widget _getLoadingLayout(BuildContext context) {
-    return Padding(
-        padding: EdgeInsets.all(20),
-        child: Flex(
-            direction: Axis.vertical,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              CircularProgressIndicator(
-                backgroundColor: ColorConstant.BLACK,
-                valueColor: new AlwaysStoppedAnimation(ColorUtil('#ffffffff')),
-              ),
-              Padding(
-                padding: EdgeInsets.all(50),
-                child: Text(
-                  'Please Wait...',
-                  style: Styles.getWhiteTextTheme(
-                      Theme.of(context).textTheme.display1),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-            ]));
   }
 
   Widget _getErrorLayout(BuildContext context) {

@@ -4,6 +4,7 @@ import 'package:Orchid/src/styles.dart';
 import 'package:Orchid/src/ui/BloC/SearchBloc.dart';
 import 'package:Orchid/src/ui/core/BaseWidgetState.dart';
 import 'package:Orchid/src/ui/screens/MovieDetailScreen.dart';
+import 'package:Orchid/src/ui/widgets/LoadingWidget.dart';
 import 'package:Orchid/src/utils/ColorUtil.dart';
 import 'package:Orchid/src/utils/DisplayUtil.dart';
 import 'package:flutter/material.dart';
@@ -99,7 +100,8 @@ class _SearchScreenState extends BaseWidgetState<SearchScreen> {
                 _getSearchBoxLayout(context),
 //              _getMovieGridLayout(context),
                 _bloc.isProgressVisible
-                    ? _getLoadingLayout(context)
+//                    ? _getLoadingLayout(context)
+                    ? LoadingWidget()
                     : _bloc.isEmptyList
                         ? _getNoResultLayout(context)
                         : _getMovieGridLayout(context),
@@ -151,37 +153,6 @@ class _SearchScreenState extends BaseWidgetState<SearchScreen> {
     );
   }
 
-  Widget _getLoadingLayout(BuildContext context) {
-    return Flexible(
-      flex: 1,
-      child: SingleChildScrollView(
-        scrollDirection: Axis.vertical,
-        child: Padding(
-            padding: EdgeInsets.fromLTRB(0, 80, 0, 0),
-            child: Center(
-              child: Column(
-                  mainAxisSize: MainAxisSize.max,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    CircularProgressIndicator(
-                      backgroundColor: ColorConstant.BLACK,
-                      valueColor:
-                          new AlwaysStoppedAnimation(ColorUtil('#ffffffff')),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.all(50),
-                      child: Text(
-                        'Please Wait...',
-                        style: Styles.getWhiteTextTheme(
-                            Theme.of(context).textTheme.display1),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ]),
-            )),
-      ),
-    );
-  }
 
   Widget _getNoResultLayout(BuildContext context) {
     return Flexible(

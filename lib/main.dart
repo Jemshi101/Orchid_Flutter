@@ -64,6 +64,7 @@ class MyApp extends StatelessWidget {
             value: MovieDetailsBloc()),
       ],
       child: MaterialApp(
+        debugShowCheckedModeBanner: false,
         title: 'Orchid',
         theme: ThemeData(
           // This is the theme of your application.

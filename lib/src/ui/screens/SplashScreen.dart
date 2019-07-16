@@ -3,6 +3,7 @@ import 'package:Orchid/src/styles.dart';
 import 'package:Orchid/src/ui/BloC/SplashBloc.dart';
 import 'package:Orchid/src/ui/screens/LoginScreen.dart';
 import 'package:Orchid/src/ui/screens/SearchScreen.dart';
+import 'package:Orchid/src/ui/widgets/LoadingWidget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:provider/provider.dart';
@@ -24,7 +25,6 @@ class SplashScreen extends StatefulWidget {
   @override
   _SplashScreenState createState() => _SplashScreenState();
 }
-
 
 class _SplashScreenState extends State<SplashScreen> {
   final _scaffoldKey = new GlobalKey<ScaffoldState>();
@@ -74,19 +74,9 @@ class _SplashScreenState extends State<SplashScreen> {
         constraints: BoxConstraints.expand(),
         color: ColorConstant.CARBON,
         child: ListView(children: [
-          Flex(
-            direction: Axis.vertical,
-            children: [
-              Container(
-                width: 200,
-                height: 200,
-                margin: EdgeInsets.all(100),
-                child: Image.asset('assets/images/logo.png',
-                    alignment: AlignmentDirectional.topCenter),
-              ),
-              _getLoadingLayout(context),
-            ],
-          )
+          _getLogo(),
+//          _getLoadingLayout(context)
+          LoadingWidget(),
         ]),
       ),
       /* floatingActionButton: FloatingActionButton(
@@ -97,7 +87,20 @@ class _SplashScreenState extends State<SplashScreen> {
     );
   }
 
-  Flex _getLoadingLayout(BuildContext context) {
+  Container _getLogo() {
+    return Container(
+      width: 200,
+      height: 200,
+      margin: EdgeInsets.all(100),
+      child: Image.asset(
+        'assets/images/logo.png',
+        alignment: AlignmentDirectional.topCenter,
+        fit: BoxFit.contain,
+      ),
+    );
+  }
+
+  /*Flex _getLoadingLayout(BuildContext context) {
     return Flex(
       direction: Axis.vertical,
       children: [
@@ -116,7 +119,7 @@ class _SplashScreenState extends State<SplashScreen> {
         ),
       ],
     );
-  }
+  }*/
 
   _navigateToSearchPage(BuildContext context) {
     Route route =
