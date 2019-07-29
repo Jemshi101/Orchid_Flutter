@@ -204,15 +204,24 @@ class _SearchScreenState extends BaseWidgetState<SearchScreen> {
         onPanDown: (_) {
           FocusScope.of(context).requestFocus(FocusNode());
         },
-        child: GridView.count(
-          crossAxisCount: (DisplayUtil.getDisplayWidth(context) ~/ 160) > 1
-              ? DisplayUtil.getDisplayWidth(context) ~/ 160
-              : 1,
-          padding: EdgeInsets.all(16.0),
-          childAspectRatio: 8.0 / 9.0,
-          children: _buildGridCards(context),
-          controller: _scrollController,
+        child: GridView.builder(
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: (DisplayUtil.getDisplayWidth(context) ~/ 160) > 1
+                ? DisplayUtil.getDisplayWidth(context) ~/ 160
+                : 1,
+            childAspectRatio: 8.0 / 9.0,
+            crossAxisSpacing: 4,
+            mainAxisSpacing: 4,
+          ),
+          itemCount: _bloc.currentSearchResponse.movieList.length,
+          itemBuilder: (BuildContext context, int index){
+            final ThemeData theme = Theme.of(context);
+            return _getMovieCard(_bloc.currentSearchResponse.movieList[index], theme);
+          },
+          padding: EdgeInsets.all(4.0),
+//          children: _buildGridCards(context, data),
 //      children: [],
+          controller: _scrollController,
         ),
       ),
     );
@@ -229,29 +238,33 @@ class _SearchScreenState extends BaseWidgetState<SearchScreen> {
         locale: Localizations.localeOf(context).toString());*/
 
     return _bloc.currentSearchResponse.movieList.map((movieBean) {
-      return Card(
-        clipBehavior: Clip.antiAlias,
-        // TODO: Adjust card heights (103)
-        child: Material(
-          child: InkWell(
-            key: Key("movie"),
-            highlightColor: Colors.amberAccent,
-            splashColor: Colors.amber,
-            enableFeedback: true,
-            onTap: () {
-              _navigateToMovieDetailPage(movieBean);
-            },
-            child: Stack(
-                // TODO: Center items on the card (103)
-                alignment: AlignmentDirectional.topCenter,
-                children: <Widget>[
-                  _getMovieItemImage(movieBean),
-                  _getMovieItemTitleOverlay(movieBean, theme)
-                ]),
-          ),
-        ),
-      );
+      return _getMovieCard(movieBean, theme);
     }).toList();
+  }
+
+  Card _getMovieCard(MovieBean movieBean, ThemeData theme) {
+    return Card(
+      clipBehavior: Clip.antiAlias,
+      // TODO: Adjust card heights (103)
+      child: Material(
+        child: InkWell(
+          key: Key("movie"),
+          highlightColor: Colors.amberAccent,
+          splashColor: Colors.amber,
+          enableFeedback: true,
+          onTap: () {
+            _navigateToMovieDetailPage(movieBean);
+          },
+          child: Stack(
+              // TODO: Center items on the card (103)
+              alignment: AlignmentDirectional.topCenter,
+              children: <Widget>[
+                _getMovieItemImage(movieBean),
+                _getMovieItemTitleOverlay(movieBean, theme)
+              ]),
+        ),
+      ),
+    );
   }
 
   Widget _getMovieItemTitleOverlay(MovieBean movieBean, ThemeData theme) {
