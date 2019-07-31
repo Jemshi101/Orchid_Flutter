@@ -6,6 +6,7 @@ class Styles {
       color: Colors.white,
     );
   }
+
   static getColoredTextTheme(TextStyle textStyle, Color color) {
     return textStyle.apply(
       color: color,
@@ -20,8 +21,8 @@ class Styles {
 
   static getInputBoxTheme() {
     return new ThemeData(
-        primaryColor: Colors.purple,
-        primaryColorDark: Colors.deepPurple,
-        hintColor: Colors.deepPurpleAccent);
+        primaryColor: Colors.purpleAccent,
+        primaryColorDark: Colors.purple[500],
+        hintColor: Colors.purple[500]);
   }
 }

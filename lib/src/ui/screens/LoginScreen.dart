@@ -2,7 +2,7 @@ import 'package:Orchid/src/constants/Colors.dart';
 import 'package:Orchid/src/decorations.dart';
 import 'package:Orchid/src/styles.dart';
 import 'package:Orchid/src/ui/BloC/LoginBloc.dart';
-import 'package:Orchid/src/ui/core/BaseWidgetState.dart';
+import 'package:Orchid/src/ui/core/BaseState.dart';
 import 'package:Orchid/src/ui/screens/SearchScreen.dart';
 import 'package:Orchid/src/ui/widgets/LoadingWidget.dart';
 import 'package:flutter/material.dart';
@@ -27,7 +27,7 @@ class LoginScreen extends StatefulWidget {
   _LoginScreenState createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends BaseWidgetState<LoginScreen> {
+class _LoginScreenState extends BaseState<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
@@ -44,13 +44,24 @@ class _LoginScreenState extends BaseWidgetState<LoginScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    _bloc = Provider.of<LoginBloc>(context);
-    _bloc.snackBarStream.stream.listen((snackBarBean) {
-      showSnackBar(
-          snackBarBean.message, snackBarBean.time, snackBarBean.action);
-    });
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_bloc == null) {
+      _bloc = Provider.of<LoginBloc>(context);
+      _bloc.snackBarStream.stream.forEach((snackBarBean) {
+        showSnackBar(
+            snackBarBean.message, snackBarBean.time, snackBarBean.action);
+      });
+      _bloc.isLoggedInController.stream.forEach((isLoggedIn) {
+        if (isLoggedIn) {
+          _navigateToSearchPage();
+        }
+      });
+    }
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       key: scaffoldKey,
       /*appBar: AppBar(
@@ -64,24 +75,17 @@ class _LoginScreenState extends BaseWidgetState<LoginScreen> {
         constraints: BoxConstraints.expand(),
         color: ColorConstant.CARBON,
         child: ListView(children: [
-          Flex(
-            direction: Axis.vertical,
-            children: [
-              Container(
-                width: 200,
-                height: 200,
-                margin: EdgeInsets.all(100),
-                child: Image.asset('assets/images/logo.png',
-                    alignment: AlignmentDirectional.topCenter),
-              ),
-              !_bloc.isLoggedIn
-                  ? _bloc.isProgressVisible
-                      ? LoadingWidget()
-//                      _getLoadingLayout(context)
-                      : _getLoginLayout(context)
-                  : _navigateToSearchPage(),
-            ],
-          )
+          Container(
+            width: 200,
+            height: 200,
+            margin: EdgeInsets.fromLTRB(100, 100, 100, 50),
+            child: Image.asset('assets/images/logo.png',
+                alignment: AlignmentDirectional.topCenter),
+          ),
+//          !_bloc.isLoggedIn
+//              ?
+          _bloc.isProgressVisible ? LoadingWidget() : _getLoginLayout(context)
+//              : _navigateToSearchPage()
         ]),
       ),
       /* floatingActionButton: FloatingActionButton(
@@ -93,8 +97,8 @@ class _LoginScreenState extends BaseWidgetState<LoginScreen> {
   }
 
   Widget _getLoginLayout(BuildContext context) {
-    return Flex(
-      direction: Axis.vertical,
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         _getEmailTextField(context),
         _getPasswordTextField(context),

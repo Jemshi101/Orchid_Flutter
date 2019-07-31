@@ -2,7 +2,7 @@ import 'package:Orchid/src/constants/Colors.dart';
 import 'package:Orchid/src/models/MovieBean.dart';
 import 'package:Orchid/src/styles.dart';
 import 'package:Orchid/src/ui/BloC/SearchBloc.dart';
-import 'package:Orchid/src/ui/core/BaseWidgetState.dart';
+import 'package:Orchid/src/ui/core/BaseState.dart';
 import 'package:Orchid/src/ui/screens/MovieDetailScreen.dart';
 import 'package:Orchid/src/ui/widgets/LoadingWidget.dart';
 import 'package:Orchid/src/utils/ColorUtil.dart';
@@ -22,7 +22,7 @@ class SearchScreen extends StatefulWidget {
   _SearchScreenState createState() => _SearchScreenState();
 }
 
-class _SearchScreenState extends BaseWidgetState<SearchScreen> {
+class _SearchScreenState extends BaseState<SearchScreen> {
   final _searchController = TextEditingController();
   ScrollController _scrollController;
 
@@ -45,12 +45,24 @@ class _SearchScreenState extends BaseWidgetState<SearchScreen> {
     super.initState();
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_bloc == null) {
+      _bloc = Provider.of<SearchBloc>(context);
+      _bloc.snackBarStream.stream.listen((snackBarBean) {
+        showSnackBar(
+            snackBarBean.message, snackBarBean.time, snackBarBean.action);
+      });
+    }
+  }
+
   void _scrollListener() {
     currentScrollOffset = _scrollController.offset;
 
 //    if (_scrollController.offset >=
     if (_scrollController.position.pixels >=
-            _scrollController.position.maxScrollExtent &&
+        _scrollController.position.maxScrollExtent &&
         !_scrollController.position.outOfRange) {
       /*if (_bloc.currentSearchResponse != null &&
           _bloc.currentSearchResponse.movieList.length <
@@ -60,7 +72,7 @@ class _SearchScreenState extends BaseWidgetState<SearchScreen> {
       //          message = "reach the bottom";
     }
     if (_scrollController.offset <=
-            _scrollController.position.minScrollExtent &&
+        _scrollController.position.minScrollExtent &&
         !_scrollController.position.outOfRange) {
       //          message = "reach the top";
     }
@@ -68,7 +80,6 @@ class _SearchScreenState extends BaseWidgetState<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
-    _bloc = Provider.of<SearchBloc>(context);
     // This method is rerun every time setState is called, for instance as done
     // by the _incrementCounter method above.
     //
@@ -91,21 +102,25 @@ class _SearchScreenState extends BaseWidgetState<SearchScreen> {
           ),
           GestureDetector(
             behavior: HitTestBehavior.deferToChild,
-            onTapDown: (TapDownDetails details){
+            onTapDown: (TapDownDetails details) {
               FocusScope.of(context).requestFocus(new FocusNode());
             },
-            child: Column(
-              children: <Widget>[
-//              if (isLoading) LinearProgressIndicator(),
-                _getSearchBoxLayout(context),
-//              _getMovieGridLayout(context),
-                _bloc.isProgressVisible
+            child: Consumer<SearchBloc>(
+              builder: (context, _bloc, child) {
+                return Column(
+                  children: <Widget>[
+//                    _getSearchBoxLayout(context),
+                    child,
+                    _bloc.isProgressVisible
 //                    ? _getLoadingLayout(context)
-                    ? LoadingWidget()
-                    : _bloc.isEmptyList
+                        ? LoadingWidget()
+                        : _bloc.isEmptyList
                         ? _getNoResultLayout(context)
                         : _getMovieGridLayout(context),
-              ],
+                  ],
+                );
+              },
+              child: _getSearchBoxLayout(context),
             ),
           ),
         ],
@@ -119,7 +134,7 @@ class _SearchScreenState extends BaseWidgetState<SearchScreen> {
 
   Widget _getSearchBoxLayout(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.fromLTRB(20, 20, 20, 5),
+      padding: EdgeInsets.fromLTRB(8, 20, 8, 5),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisSize: MainAxisSize.max,
@@ -135,7 +150,10 @@ class _SearchScreenState extends BaseWidgetState<SearchScreen> {
                   autofocus: false,
                   controller: _searchController,
                   style: Styles.getWhiteTextTheme(
-                      Theme.of(context).textTheme.title),
+                      Theme
+                          .of(context)
+                          .textTheme
+                          .title),
                   decoration: InputDecoration(
                       labelStyle: TextStyle(
                           color: ColorUtil.getColorFromHex("#bbffffff")),
@@ -152,7 +170,6 @@ class _SearchScreenState extends BaseWidgetState<SearchScreen> {
       ),
     );
   }
-
 
   Widget _getNoResultLayout(BuildContext context) {
     return Flexible(
@@ -176,7 +193,10 @@ class _SearchScreenState extends BaseWidgetState<SearchScreen> {
               child: Text(
                 'No Movies Found!!!',
                 style: Styles.getWhiteTextTheme(
-                    Theme.of(context).textTheme.display1),
+                    Theme
+                        .of(context)
+                        .textTheme
+                        .display1),
                 textAlign: TextAlign.center,
                 textScaleFactor: .7,
               ),
@@ -213,10 +233,13 @@ class _SearchScreenState extends BaseWidgetState<SearchScreen> {
             crossAxisSpacing: 4,
             mainAxisSpacing: 4,
           ),
-          itemCount: _bloc.currentSearchResponse.movieList.length,
-          itemBuilder: (BuildContext context, int index){
+          itemCount: _bloc.currentSearchResponse != null
+              ? _bloc.currentSearchResponse.movieList.length
+              : 0,
+          itemBuilder: (BuildContext context, int index) {
             final ThemeData theme = Theme.of(context);
-            return _getMovieCard(_bloc.currentSearchResponse.movieList[index], theme);
+            return _getMovieCard(
+                _bloc.currentSearchResponse.movieList[index], theme);
           },
           padding: EdgeInsets.all(4.0),
 //          children: _buildGridCards(context, data),
@@ -256,7 +279,7 @@ class _SearchScreenState extends BaseWidgetState<SearchScreen> {
             _navigateToMovieDetailPage(movieBean);
           },
           child: Stack(
-              // TODO: Center items on the card (103)
+            // TODO: Center items on the card (103)
               alignment: AlignmentDirectional.topCenter,
               children: <Widget>[
                 _getMovieItemImage(movieBean),
@@ -297,6 +320,8 @@ class _SearchScreenState extends BaseWidgetState<SearchScreen> {
         placeholder: "assets/images/little-dino.jpg",
         image: movieBean.poster,
         fit: BoxFit.cover,
+        placeholderScale: .1,
+        imageScale: .1,
       ),
       /*child: Image.network(
 //                "assets/images/Robot.png",
@@ -334,7 +359,8 @@ class _SearchScreenState extends BaseWidgetState<SearchScreen> {
 
   _navigateToMovieDetailPage(MovieBean movieBean) {
     Route route = MaterialPageRoute(
-        builder: (context) => MovieDetailScreen(
+        builder: (context) =>
+            MovieDetailScreen(
               movieBean,
               title: movieBean.title,
             ));

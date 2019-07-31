@@ -1,29 +1,25 @@
-import 'package:Orchid/src/constants/AppConstants.dart';
 import 'package:Orchid/src/constants/Colors.dart';
 import 'package:Orchid/src/models/MovieBean.dart';
-import 'package:Orchid/src/network/DataManager.dart';
-import 'package:Orchid/src/network/models/MovieDetailResponse.dart';
-import 'package:Orchid/src/ui/BloC/MovieDetailsBloc.dart';
-import 'package:Orchid/src/ui/widgets/LoadingWidget.dart';
-import 'package:Orchid/src/utils/ColorUtil.dart';
-import 'package:flutter/material.dart';
-//import 'package:flutter_web/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:Orchid/src/styles.dart';
+import 'package:Orchid/src/ui/BloC/MovieDetailsBloc.dart';
+import 'package:Orchid/src/ui/core/BaseState.dart';
+import 'package:Orchid/src/ui/widgets/LoadingWidget.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:provider/provider.dart';
 
 class MovieDetailScreen extends StatefulWidget {
   final String title;
   final MovieBean movieBean;
+
   MovieDetailScreen(this.movieBean, {Key key, this.title}) : super(key: key);
 
   @override
   _MovieDetailScreenState createState() => _MovieDetailScreenState();
 }
 
-class _MovieDetailScreenState extends State<MovieDetailScreen> {
+class _MovieDetailScreenState extends BaseState<MovieDetailScreen> {
   MovieDetailsBloc _bloc;
-
 
   @override
   void initState() {
@@ -35,8 +31,19 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_bloc == null) {
+      _bloc = Provider.of<MovieDetailsBloc>(context);
+      _bloc.snackBarStream.stream.listen((snackBarBean) {
+        showSnackBar(
+            snackBarBean.message, snackBarBean.time, snackBarBean.action);
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    _bloc = Provider.of<MovieDetailsBloc>(context);
     // This method is rerun every time setState is called, for instance as done
     // by the _incrementCounter method above.
     //
@@ -144,7 +151,8 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
         Text(
           'Year : ',
           style: Styles.getColoredTextTheme(
-              Theme.of(context).textTheme.subtitle, ColorConstant.COLOR_PRIMARY),
+              Theme.of(context).textTheme.subtitle,
+              ColorConstant.COLOR_PRIMARY),
           textAlign: TextAlign.start,
         ),
         Text(
@@ -167,7 +175,8 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
           Text(
             'Genre : ',
             style: Styles.getColoredTextTheme(
-                Theme.of(context).textTheme.subtitle, ColorConstant.COLOR_PRIMARY),
+                Theme.of(context).textTheme.subtitle,
+                ColorConstant.COLOR_PRIMARY),
             textAlign: TextAlign.start,
           ),
           Text(
@@ -191,7 +200,8 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
           Text(
             'Language : ',
             style: Styles.getColoredTextTheme(
-                Theme.of(context).textTheme.subtitle, ColorConstant.COLOR_PRIMARY),
+                Theme.of(context).textTheme.subtitle,
+                ColorConstant.COLOR_PRIMARY),
             textAlign: TextAlign.start,
           ),
           Text(
@@ -215,7 +225,8 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
           Text(
             'Rating : ',
             style: Styles.getColoredTextTheme(
-                Theme.of(context).textTheme.subtitle, ColorConstant.COLOR_PRIMARY),
+                Theme.of(context).textTheme.subtitle,
+                ColorConstant.COLOR_PRIMARY),
             textAlign: TextAlign.start,
           ),
           Text(
@@ -239,7 +250,8 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
           Text(
             'Votes : ',
             style: Styles.getColoredTextTheme(
-                Theme.of(context).textTheme.subtitle, ColorConstant.COLOR_PRIMARY),
+                Theme.of(context).textTheme.subtitle,
+                ColorConstant.COLOR_PRIMARY),
             textAlign: TextAlign.start,
           ),
           Text(
@@ -279,7 +291,8 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
         Text(
           'Title : ',
           style: Styles.getColoredTextTheme(
-              Theme.of(context).textTheme.subtitle, ColorConstant.COLOR_PRIMARY),
+              Theme.of(context).textTheme.subtitle,
+              ColorConstant.COLOR_PRIMARY),
           textAlign: TextAlign.start,
         ),
         Text(
@@ -300,7 +313,8 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
           Text(
             'Plot Summary : ',
             style: Styles.getColoredTextTheme(
-                Theme.of(context).textTheme.subtitle, ColorConstant.COLOR_PRIMARY),
+                Theme.of(context).textTheme.subtitle,
+                ColorConstant.COLOR_PRIMARY),
             textAlign: TextAlign.start,
           ),
           Text(
@@ -323,7 +337,8 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
           Text(
             'Director : ',
             style: Styles.getColoredTextTheme(
-                Theme.of(context).textTheme.subtitle, ColorConstant.COLOR_PRIMARY),
+                Theme.of(context).textTheme.subtitle,
+                ColorConstant.COLOR_PRIMARY),
             textAlign: TextAlign.start,
           ),
           Text(
@@ -346,7 +361,8 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
           Text(
             'Cast : ',
             style: Styles.getColoredTextTheme(
-                Theme.of(context).textTheme.subtitle, ColorConstant.COLOR_PRIMARY),
+                Theme.of(context).textTheme.subtitle,
+                ColorConstant.COLOR_PRIMARY),
             textAlign: TextAlign.start,
           ),
           Text(
@@ -369,7 +385,8 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
           Text(
             'Writer : ',
             style: Styles.getColoredTextTheme(
-                Theme.of(context).textTheme.subtitle, ColorConstant.COLOR_PRIMARY),
+                Theme.of(context).textTheme.subtitle,
+                ColorConstant.COLOR_PRIMARY),
             textAlign: TextAlign.start,
           ),
           Text(
@@ -392,7 +409,8 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
           Text(
             'Website : ',
             style: Styles.getColoredTextTheme(
-                Theme.of(context).textTheme.subtitle, ColorConstant.COLOR_PRIMARY),
+                Theme.of(context).textTheme.subtitle,
+                ColorConstant.COLOR_PRIMARY),
             textAlign: TextAlign.start,
           ),
           Text(
@@ -415,7 +433,8 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
           Text(
             'Awards : ',
             style: Styles.getColoredTextTheme(
-                Theme.of(context).textTheme.subtitle, ColorConstant.COLOR_PRIMARY),
+                Theme.of(context).textTheme.subtitle,
+                ColorConstant.COLOR_PRIMARY),
             textAlign: TextAlign.start,
           ),
           Text(
@@ -438,7 +457,8 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
           Text(
             'Runtime : ',
             style: Styles.getColoredTextTheme(
-                Theme.of(context).textTheme.subtitle, ColorConstant.COLOR_PRIMARY),
+                Theme.of(context).textTheme.subtitle,
+                ColorConstant.COLOR_PRIMARY),
             textAlign: TextAlign.start,
           ),
           Text(
@@ -461,7 +481,8 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
           Text(
             'Released : ',
             style: Styles.getColoredTextTheme(
-                Theme.of(context).textTheme.subtitle, ColorConstant.COLOR_PRIMARY),
+                Theme.of(context).textTheme.subtitle,
+                ColorConstant.COLOR_PRIMARY),
             textAlign: TextAlign.start,
           ),
           Text(
@@ -484,7 +505,8 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
           Text(
             'Box Office : ',
             style: Styles.getColoredTextTheme(
-                Theme.of(context).textTheme.subtitle, ColorConstant.COLOR_PRIMARY),
+                Theme.of(context).textTheme.subtitle,
+                ColorConstant.COLOR_PRIMARY),
             textAlign: TextAlign.start,
           ),
           Text(
@@ -507,7 +529,8 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
           Text(
             'Production : ',
             style: Styles.getColoredTextTheme(
-                Theme.of(context).textTheme.subtitle, ColorConstant.COLOR_PRIMARY),
+                Theme.of(context).textTheme.subtitle,
+                ColorConstant.COLOR_PRIMARY),
             textAlign: TextAlign.start,
           ),
           Text(
@@ -530,7 +553,8 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
           Text(
             'Rated : ',
             style: Styles.getColoredTextTheme(
-                Theme.of(context).textTheme.subtitle, ColorConstant.COLOR_PRIMARY),
+                Theme.of(context).textTheme.subtitle,
+                ColorConstant.COLOR_PRIMARY),
             textAlign: TextAlign.start,
           ),
           Text(
@@ -553,7 +577,8 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
           Text(
             'Country : ',
             style: Styles.getColoredTextTheme(
-                Theme.of(context).textTheme.subtitle, ColorConstant.COLOR_PRIMARY),
+                Theme.of(context).textTheme.subtitle,
+                ColorConstant.COLOR_PRIMARY),
             textAlign: TextAlign.start,
           ),
           Text(
@@ -594,6 +619,4 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
       ),
     );
   }
-
-
 }

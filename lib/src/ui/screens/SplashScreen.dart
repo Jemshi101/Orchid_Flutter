@@ -1,6 +1,6 @@
 import 'package:Orchid/src/constants/Colors.dart';
-import 'package:Orchid/src/styles.dart';
 import 'package:Orchid/src/ui/BloC/SplashBloc.dart';
+import 'package:Orchid/src/ui/core/BaseState.dart';
 import 'package:Orchid/src/ui/screens/LoginScreen.dart';
 import 'package:Orchid/src/ui/screens/SearchScreen.dart';
 import 'package:Orchid/src/ui/widgets/LoadingWidget.dart';
@@ -26,7 +26,7 @@ class SplashScreen extends StatefulWidget {
   _SplashScreenState createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> {
+class _SplashScreenState extends BaseState<SplashScreen> {
   final _scaffoldKey = new GlobalKey<ScaffoldState>();
 
   SplashBloc _bloc;
@@ -40,11 +40,25 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_bloc == null) {
+      _bloc = Provider.of<SplashBloc>(context);
+
+//      _bloc.checkForLogIn();
+
+      _bloc.snackBarStream.stream.listen((snackBarBean) {
+        showSnackBar(
+            snackBarBean.message, snackBarBean.time, snackBarBean.action);
+      });
+      _bloc.isLoggedInStream.stream.listen((isLoggedIn) {
+        _processLogIn(isLoggedIn);
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    _bloc = Provider.of<SplashBloc>(context);
-    _bloc.isLoggedInStream.stream.listen((isLoggedIn) {
-      _processLogIn(isLoggedIn);
-    });
     return Scaffold(
       key: _scaffoldKey,
       /*appBar: AppBar(
